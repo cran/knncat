@@ -173,8 +173,8 @@ MATRIX *misclass_mat;
 long verbose = 0;
 
 /*============================= ord ==================================*/
-void ord (double *traindata, long *trainrows, long *traincols,
-          double *testdata,  long *testrows,  long *testcols,
+void ord (double *traindata, Slong *trainrows, Slong *traincols,
+          double *testdata,  Slong *testrows,  Slong *testcols,
           Slong *test_classes,
           double *cdata, double *phidata,
           Slong *in_number_of_classes, Slong *in_xvals,
