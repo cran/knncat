@@ -1,6 +1,6 @@
 Package: knncat
-Version: 1.1.1
-Date: 2004-11-01
+Version: 1.1.2
+Date: 2004-11-15
 Title: Nearest-neighbor classification with categorical variables
 Author: Sam Buttrey
 Maintainer: Sam Buttrey <buttrey@nps.edu>

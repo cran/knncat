@@ -1,3 +1,2 @@
-PKG_CFLAGS=-I . -pedantic -Wall -DUSE_R_ALLOC -DCALL_FROM_R
-LAPACK_LIBS=$(R_HOME)/src/modules/lapack/libRlapack.a
+PKG_CFLAGS=-I . -DUSE_R_ALLOC -DCALL_FROM_R
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
