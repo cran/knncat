@@ -1,0 +1,4 @@
+knncat.R             Build a knncat classifier; optionally, classify test set
+predict.knncat.R     Use knncat classifier to predict on new data
+print.knncat.R       Print method for knncat objects
+plot.knncat.R        Plot method for knncat objects
