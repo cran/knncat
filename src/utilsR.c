@@ -22,6 +22,13 @@ void do_nothing();
 #define free do_nothing
 #endif
 
+#ifdef CALL_FROM_R
+#define Slong int
+#else
+#define Slong long
+#endif
+
+
 #define TRUE  1
 #define FALSE 0
 
@@ -124,6 +131,22 @@ if ( (*my_array = (long *) calloc (how_many, sizeof (long))) == NULL)
 /* 	  (how_many,  (unsigned) sizeof (long))) == NULL) */
 {
     fprintf (stderr, "Unable to alloc %lu longs\n", how_many);
+    return (-1);
+}
+return (0);
+}
+/*=========================  alloc_some_Slongs  =====================*/
+int alloc_some_Slongs (Slong **my_array, unsigned long how_many)
+
+{
+/* Microsoft */
+/* size_t my_size = (size_t) how_many * sizeof (long); */
+/* Allocate "how_many" longs in memory. */
+if ( (*my_array = (Slong *) calloc (how_many, sizeof (Slong))) == NULL)
+
+/* 	  (how_many,  (unsigned) sizeof (Slong))) == NULL) */
+{
+    fprintf (stderr, "Unable to alloc %lu Slongs\n", how_many);
     return (-1);
 }
 return (0);

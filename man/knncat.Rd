@@ -5,7 +5,7 @@
 classification with categorical variables; continuous are permitted too.}
 \usage{
 knncat (train, test, k = c(1, 3, 5, 7, 9), xvals = 10, xval.ceil = -1, 
-    knots = 10, prior.ind = 1, prior, permute = 10, permute.tail = 1, 
+    knots = 10, prior.ind = 4, prior, permute = 10, permute.tail = 1, 
     improvement = .01, ridge = .003, once.out.always.out = FALSE, 
     classcol = 1, verbose = 0)
 }
@@ -23,7 +23,7 @@ first xval; >= 0, use that.}
 \item{knots}{vector of number of knots for numeric variables. Reused if
 necessary. Default: 10 for each.}
 \item{prior.ind}{Integer telling how to compute priors. 1 = estimated from
-training set; 2 = all equal; 3 = supplied in "prior"; 4 = ignored. Default: 1.}
+training set; 2 = all equal; 3 = supplied in "prior"; 4 = ignored. Default: 4.}
 \item{prior}{Numeric vector, one entry per unique element in the training
 set's classcol column, giving prior probabilities. Ignored unless
 prior.ind = 3; then they're normalized to sum to 1 and each

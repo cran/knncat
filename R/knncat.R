@@ -1,7 +1,7 @@
 "knncat" <-
 function (train, test, k = c(1, 3, 5, 7, 9), xvals = 10, xval.ceil = -1, 
     knots = 10, 
-    prior.ind = 1, prior,
+    prior.ind = 4, prior,
     permute = 10, permute.tail = 1, improvement = .01, ridge = .003, 
     once.out.always.out = FALSE, classcol = 1, verbose = 0)
 {
@@ -55,7 +55,7 @@ if (classcol != 1){
     train <- data.frame (train[,classcol], train[,-classcol])
     names(train)[1] <- classcol.name
 }
-factor.vars <- sapply (train[,-1], is.factor)
+factor.vars <- sapply (train[,-1,drop=FALSE], is.factor)
 #
 # "Missing.values" holds the values we'll use in case there are any
 # missing values in the data. We compute these in C, but we may as well
@@ -63,13 +63,13 @@ factor.vars <- sapply (train[,-1], is.factor)
 # need to save them in case the test set has missings.
 #
 missing.values <-  train[1,-1]
-missing.values[!factor.vars] <- sapply (train[,-1][,!factor.vars], mean,
+missing.values[!factor.vars] <- sapply (train[,-1,drop=FALSE][,!factor.vars], mean,
                                 na.rm=TRUE)
 most.common <- function (x) {
     tbl <- table (x)
     names(tbl)[tbl == max(tbl)][1]
 }
-missing.values[factor.vars] <- sapply (train[,-1][,factor.vars], most.common)
+missing.values[factor.vars] <- sapply (train[,-1,drop=FALSE][,factor.vars], most.common)
 vars.with.na <- sapply (train, function(x) any (is.na(x)))
 if (vars.with.na[1] == TRUE)
     stop ("No missing values allowed in response variable")
@@ -78,7 +78,7 @@ if (any (vars.with.na))
         if (vars.with.na[i] == TRUE)
             train[is.na (train[,i+1]),i + 1] <- missing.values[i]
     
-train.levs <- sapply (train[,-1], levels)
+train.levs <- lapply (train[,-1], levels)
 if (missing (test))
 {
     nrow.test <- ncol.test <- test.classes <- 0
@@ -98,7 +98,7 @@ else
 #
 # Ensure that the sets of levels for the factor variables are the same.
 #
-    test.levs <- sapply (test[,-1], levels)
+    test.levs <- sapply (test[,-1,drop=FALSE], levels)
     if (!identical (TRUE, all.equal (train.levs, test.levs)))
         stop ("Sets of levels in train and test don't match.")
 #
@@ -172,7 +172,7 @@ else
 # there's one for each level, plus the right number of knots for each numeric 
 # variable.
 #
-factor.count <- sapply (train[,-1][,factor.vars], function(x) length(unique(x)))
+factor.count <- sapply (train[,-1,drop=FALSE][,factor.vars], function(x) length(unique(x)))
 if (length(factor.count) == 0)
     factor.count <- 0
 cats.in.var[factor.vars] <- factor.count

@@ -104,7 +104,7 @@ int get_sequence_of_solutions (long quit_dimension,
     long *number_in_class, 
     long xval_ctr,
     MATRIX *xval_result, long *xval_ceiling,
-    MATRIX *cost, MATRIX *prior, int prior_ind, long number_of_classes,
+    MATRIX *cost, MATRIX *prior, long prior_ind, long number_of_classes,
     double *misclass_rate, int do_the_omission, long *increase,
     long *once_out_always_out);
 

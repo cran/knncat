@@ -103,6 +103,7 @@ long theyre_the_same = FALSE; /* Are training and test sets identical? */
 int delete_this_variable_forever = TRUE;
 
 int classification = CLASSIFICATION;
+long *once_out_always_out;
 
 double **knots;
 
@@ -154,9 +155,9 @@ long number_of_classes = 0L;     /* Number of classes. You guessed that. */
 
 long permute, permute_tail;
 /*
-** "K" is the number of nearest neighbors; "slots" is the number of neighbors
-**  we look at ( > k to deal with ties better). K is a vector so that we
-** can look a set of numbers of NNs at a time.
+** "K" is the number of nearest neighbors; "slots" (the number of neighbors we
+** look at ( > k to deal with ties better) is set in do_nn. K is a vector so 
+** that we can look a set of numbers of NNs at a time.
 */
 long k_len, slots;
 
@@ -179,11 +180,11 @@ void ord (double *traindata, long *trainrows, long *traincols,
           Slong *in_number_of_classes, Slong *in_xvals,
           Slong *in_increase, Slong *in_permute, Slong *in_permute_tail,
           double *in_ridge, double *in_knots,
-          Slong *in_k_len, Slong *k, Slong *best_k,
+          Slong *in_k_len, Slong *in_k, Slong *in_best_k,
           Slong *in_classification, double *in_improvement, 
-          Slong *in_cats_in_var, Slong *number_in_class, 
+          Slong *in_cats_in_var, Slong *in_number_in_class, 
           double *misclass_data, Slong *xval_ceiling_ind, 
-          Slong *once_out_always_out,
+          Slong *in_once_out_always_out,
           Slong *in_prior_ind, double *in_priordata,
           Slong *in_verbose, Slong *status)
 {
@@ -194,11 +195,13 @@ long permute_ctr;            /*                                        */
 long permute_len;            /*                                        */
 long *cum_cats_before_var;   /* Ith : # of categories in vars 1-(i-1)  */
 long *cum_cats_ptr;          /*                                        */
+long *number_in_class;       /*                                        */
 long *number_in_class_ptr;   /*                                        */
 long total_number_of_cats;   /* Number of levels in all categories     */
 long *permute_indices;       /*                                        */
 MATRIX *c;                   /*                                        */
 double *misclass_rate;       /*                                        */
+long *k, best_k;
 long row_ctr;
 long prior_ind;
 long dimension = 0L;
@@ -231,30 +234,52 @@ long knot_ctr;
 */
 MATRIX *xval_result;
 
-permute            = *in_permute;
-permute_tail       = *in_permute_tail;
-ridge              = *in_ridge;
-k_len              = *in_k_len;
-xvals              = *in_xvals;
-classification     = *in_classification;
-improvement        = *in_improvement;
-cats_in_var        = in_cats_in_var;
-increase           = in_increase;
-priordata          = in_priordata;
-prior_ind          = *in_prior_ind;
-verbose            = *in_verbose;
-*status            = 0L;
+permute            = (long) *in_permute;
+permute_tail       = (long) *in_permute_tail;
+ridge              = *in_ridge;               /* this is double */
+k_len              = (long) *in_k_len;
+best_k             = (long ) *in_best_k;
+
+/* Loop over the vector of nn's to fill k */
+alloc_some_longs (&k, k_len);
+for (i = 0; i < k_len; i++)
+    k[i] = (long) in_k[i];
+xvals              = (long) *in_xvals;
+classification     = (long) *in_classification;
+improvement        = *in_improvement;         /* this is double */
+
+number_of_vars    = (long) *traincols - 1;
+/* Loop over the set of columns to fill these two */
+alloc_some_longs (&cats_in_var, number_of_vars);
+alloc_some_longs (&increase, number_of_vars);
+for (i = 0; i < number_of_vars; i++)
+{
+    cats_in_var[i] = in_cats_in_var[i];
+    increase[i]    = in_increase[i];
+}
+/* Loop over the set of classes to fill number_in_class */
+number_of_classes = (long) *in_number_of_classes;
+alloc_some_longs (&number_in_class, number_of_classes);
+for (i = 0; i < number_of_classes; i++)
+    number_in_class[i] = in_number_in_class[i];
+
+priordata          = in_priordata;            /* this is double */
+prior_ind          = (long) *in_prior_ind;
+verbose            = (long) *in_verbose;
+once_out_always_out = (long *) in_once_out_always_out;
+*status            = (Slong) 0;
 
 
 all_unordered     = all_numeric = FALSE;
-train_n           = *trainrows;
-train_n_long      = *trainrows;
-test_n            = *testrows;
-number_of_vars    = *traincols - 1;
-number_of_classes = *in_number_of_classes;
+train_n           = (unsigned long) *trainrows;
+train_n_long      = (long) *trainrows;
+test_n            = (unsigned long) *testrows;
 
-prior = make_matrix (number_of_classes, number_of_classes, "Priors", REGULAR,
-                     ZERO_THE_MATRIX);
+if (prior_ind == IGNORED)
+    prior = (MATRIX *) NULL;
+else
+    prior = make_matrix (number_of_classes, number_of_classes, "Priors", 
+                         REGULAR, ZERO_THE_MATRIX);
 
 alloc_some_longs (&permute_indices, train_n);
 alloc_some_longs (&xval_indices, train_n);
@@ -414,7 +439,7 @@ if (get_seq_result == FALSE)
     print_matrix (global_copy_of_u, (0x10) | (0x40));
     print_matrix (original_eigenvectors, (0x10) | (0x40));
 */
-    *status = -1L;
+    *status = (Slong) -1;
     return;
 }
 
@@ -427,7 +452,7 @@ if (dimension == 0)
 {
     if (verbose > 1)
         Rprintf ("Hmmmm....no variable made it in. Guess the biggest?\n");
-    *status  = -2L;
+    *status  = (Slong) -2;
     return;
 }
 
@@ -472,7 +497,7 @@ get_seq_result = get_sequence_of_solutions (smallest_misclass_dim + 1,
 if (get_seq_result == FALSE)
 {
     Rprintf ("Panic! Get_seq returned FALSE\n");
-    *status = -1L;
+    *status = (Slong) -1;
     return;
 }
 
@@ -502,11 +527,12 @@ if (classification == CLASSIFICATION)
     for (i = 0; i < original_eigenvectors->nrow; i++)
         phidata[i] = phi->data[i];
     
-    for (i = 0; i < number_of_classes; i++)
-        priordata[i] = *SUB (prior, i, i);
+    if (prior_ind != IGNORED)
+        for (i = 0; i < number_of_classes; i++)
+            priordata[i] = *SUB (prior, i, i);
     
 
-    *best_k = k[smallest_misclass_k];
+    best_k = k[smallest_misclass_k];
     do_nn_result = TRUE;
 
 /*
@@ -518,7 +544,7 @@ if (classification == CLASSIFICATION)
     {
         return_classes = &long_FALSE;
         do_nn_result = do_nn (&long_FALSE, training, training,
-                     c, best_k, &one, 
+                     c, &best_k, &one, 
                      &long_TRUE, /* theyre_the_same */
                      phi->data, cats_in_var,
                      cum_cats_ptr, knots, cost, prior, 
@@ -531,7 +557,7 @@ if (classification == CLASSIFICATION)
     {
         return_classes = &long_TRUE;
         do_nn_result = do_nn (&long_FALSE, training, test,
-                     c, best_k, &one, 
+                     c, &best_k, &one, 
                      &long_FALSE, /* theyre_the_same */
                      phi->data, cats_in_var,
                      cum_cats_ptr, knots, cost, prior, 
@@ -540,6 +566,9 @@ if (classification == CLASSIFICATION)
                      &one, &zero, (long *) NULL, /* <- xval stuff */
                      increase, &number_of_classes, &verbose);
     }
+
+    *in_best_k = (Slong) best_k;
+
     if (do_nn_result == FALSE)
     {
         Rprintf ("Panic! do_nn (2) returned FALSE!\n");
@@ -555,7 +584,7 @@ if (classification == CLASSIFICATION)
     return_classes = &long_FALSE;
     do_nn (&long_TRUE, training, test, c, &(k[smallest_misclass_k]), &one, 
         &long_FALSE, phi->data, cats_in_var, cum_cats_ptr, knots, cost, 
-        prior, misclass_rate, misclass_mat, FALSE, (long *) NULL,
+        prior, misclass_rate, misclass_mat, FALSE, (Slong *) NULL,
         (long *) NULL, (long *) NULL, (long *) NULL,
         (long *) NULL, (long *) NULL, (long *) NULL);
 
@@ -1137,6 +1166,9 @@ int divide_by_root_prior (MATRIX *in, MATRIX *prior)
 unsigned long i, j;
 double jth_diag;
 
+if (prior == (MATRIX *) NULL)
+    return (TRUE);
+
 for (j = 0; j < in->ncol; j++)
 {
     jth_diag = *SUB (prior, j, j);
@@ -1158,6 +1190,9 @@ int multiply_by_root_prior (MATRIX *in, MATRIX *prior)
 {
 unsigned long i, j;
 double jth_diag;
+
+if (prior == (MATRIX *) NULL)
+    return (TRUE);
 
 if (in->ncol != prior->ncol)
 {
@@ -1823,19 +1858,6 @@ F77_CALL(dsygv) (&problem_type, &the_letter_V, &the_letter_U,
 
     eigenvec_ptr->data = u->data;
 
-    if (eigenval_ptr->data[0] == 0.0
-    &&  eigenval_ptr->data[1] == 0.0
-    &&  eigenval_ptr->data[2] == 0.0
-    &&  eigenval_ptr->data[3] == 0.0)
-    {
-        Rprintf ("DET: all-zero eigenval matrix!\n");
-        print_matrix (global_copy_of_u, 8); 
-        print_matrix (global_copy_of_w, 8); 
-        print_matrix (eigenval_ptr, 8);
-        print_matrix (eigenvec_ptr, 8);
-        return (FALSE);
-    }
-
     if (eigenvec_ptr->nrow == 1)
         eigenvec_ptr->data[0] = 1.0;
 }
@@ -2003,14 +2025,10 @@ if (we_ve_computed_prior == FALSE)
                         *SUB ( (*prior), class_ctr, class_ctr);
                 }
             }
-            else /* must be "IGNORED" */
-            {
-/**** DELETED FOR NOW : do nothing
-*****           if (*prior != (MATRIX *) NULL)
-*****               free_matrix (*prior);
-*****           *prior = (MATRIX *) NULL;
-***/
-            }
+/* 
+** Here's where we would say "else prior ind must be IGNORED", but in
+** this case there's nothing to do. Prior is a NULL matrix anyway.
+*/
         }
     }
     we_ve_computed_prior = TRUE;
@@ -2359,7 +2377,7 @@ int get_sequence_of_solutions (long quit_dimension,
     long *number_in_class, 
     long xval_ctr,
     MATRIX *xval_result, long *xval_ceiling,
-    MATRIX *cost, MATRIX *prior, int prior_ind, long number_of_classes,
+    MATRIX *cost, MATRIX *prior, long prior_ind, long number_of_classes,
     double *misclass_rate, int do_the_omission, long *increase,
     long *once_out_always_out)
 {
@@ -2590,7 +2608,7 @@ if (first_time_through)
                    c, k, &k_len, &long_TRUE, /* theyre_the_same */
                    SUB (best_eigenvector, 0L, 0L),
                    cats_in_var, cum_cats_ptr, knots, cost,
-                   prior, misclass_rate, NULL, return_classes, (long *) NULL,
+                   prior, misclass_rate, NULL, return_classes, (Slong *) NULL,
                    &xval_lower, &xval_upper, xval_indices,
                    increase, &number_of_classes, &verbose);
                if (do_nn_result == FALSE)

@@ -16,7 +16,14 @@ void do_nothing();
 #define free do_nothing
 #endif
 
+#ifdef CALL_FROM_R
+#define Slong int
+#else
+#define Slong long
+#endif
+
 long verbose;
+long global_test_ctr;
 long number_of_classes;
 long *xval_indices;
 long xval_lower;
@@ -25,10 +32,15 @@ long *increase;
 
 double c_euclidean (double *, double *, double *, long, double);
 double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c, 
-                    long n, double threshold, long *cats_in_var, long *cum_cats,
+                    long n, double threshold, long *cats_in_var, 
+                    long *cum_cats,
                     MATRIX *prior, double **knots);
 double c_absolute (double *, double *, double *, long, double);
 
+/* Statics for "xpoll" */
+static double *class_results;
+static double *class_results_with_ties;
+static int *tie_marker;
 void xpoll (long *classes, double *distances, long *k, long how_many_ks,
           long largest_k, long slots, MATRIX * prior, long *outcome);
 /*=========================== do_nn =================================*/
@@ -39,7 +51,7 @@ int do_nn (long *quit, MATRIX *training, MATRIX *test,
            long *cum_cats_this_subset,
            double **knots,
            MATRIX *cost, MATRIX *prior, double *error_rates,
-           MATRIX *misclass_mat, long *return_classes, long *classes,
+           MATRIX *misclass_mat, long *return_classes, Slong *classes,
            long *in_xval_lower, long *in_xval_upper, long *in_xval_indices,
            long *in_increase, long *in_number_of_classes, long *in_verbose)
 {
@@ -146,6 +158,9 @@ if (*quit == TRUE)
     free (nearest_class);
     free (poll_result);
     free (misclass_with_distance_zero);
+    free (class_results);
+    free (class_results_with_ties);
+    free (tie_marker);
     initialized = FALSE;
     return (TRUE);
 }
@@ -170,6 +185,7 @@ test_item_count = 0L;
 */
 for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
 {
+    global_test_ctr = test_ctr;
     if (xval_indices != (long *) NULL)
     {
             if ((xval_lower < xval_upper)
@@ -282,11 +298,12 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
     } /* end "for" for looping over the training set. */
 
 
-        if (verbose > 2)
+        if (verbose >= 2 && test_ctr <= 1)
         {
             Rprintf ("Test rec %li (a %li) has closest ", test_ctr, 
-                                  *SUB (training, train_ctr, 0));
-            for (j = 0; j < slots; j++)
+                          (long) *SUB (training, train_ctr, 0));
+            /* for (j = 0; j < slots; j++) */
+            for (j = 0; j < 1; j++)
             {
                 Rprintf ( "(%i:) rec. %li, class %li    ", 
                     j, nearest_neighbor[j], nearest_class[j]);
@@ -306,10 +323,21 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
         for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
             Rprintf ("nearest_class[k_ctr] is %i...", nearest_class[k_ctr]);
     }
+
+    if (verbose >= 2 && test_ctr <= 1)
+    {
+        Rprintf ("About to poll for test record %li\n", test_ctr);
+        for (j = 0; j < 5; j++)
+        {
+            Rprintf ("%li: %li: nn %li, class %li, dist %lf\n", 
+                test_ctr, j, nearest_neighbor[j], 
+                nearest_class[j], nearest_distance[j]);
+        }
+    }
     xpoll (nearest_class, nearest_distance, k, how_many_ks, 
           largest_k, slots, prior, poll_result);
 
-    if (verbose > 3)
+    if (verbose >= 2 && test_ctr <= 1)
     {
         for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
             Rprintf (", poll_result is %i\n", poll_result[k_ctr]);
@@ -321,7 +349,7 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
 ** presumably there's only one specific k supplied anyway.
 */
     if (*return_classes == TRUE)
-        classes[test_ctr] = poll_result[0];
+        classes[test_ctr] = (Slong) poll_result[0];
 
     for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
     {
@@ -372,13 +400,19 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
     }
 }
 
+/*
+** The responsible user will have freed this memory with a call
+** with initialized=-TRUE, so this is unnecessary.
+**/ 
+/***
 free (nearest_distance);
 free (nearest_neighbor);
 free (nearest_class);
 free (poll_result);
-/* free (misclass); */
+** free (misclass); **
 free (misclass_with_distance_zero);
 initialized = FALSE;
+***/
 
 return (TRUE);
 
@@ -388,9 +422,6 @@ return (TRUE);
 void xpoll (long *classes, double *distances, long *k, long how_many_ks,
           long largest_k, long slots, MATRIX * prior, long *outcome)
 {
-static double *class_results;
-static double *class_results_with_ties;
-static int *tie_marker;
 int i, k_ctr;
 int tie;
 int max_count;
@@ -431,6 +462,7 @@ for (i = 0; i < number_of_classes; i++)
 ** clear for k = 1. For k = 2, ties are broken by the first nearest
 ** neighbor anyway.)
 */
+
 for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
 {
 /*** This is wrong. These things can be ties.
@@ -441,9 +473,12 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
     }
 ****/
 
+
 /* Zero out the "class_results" array ... */
     for (i = 0; i < number_of_classes; i++)
+    {
         class_results[i] = 0.0;
+    }
     
 /* ...and go through the neighbors to fill it up again. When classes[i]
 ** = j, add one to the j-th entry of class_results. Well, not one,
@@ -475,7 +510,7 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
     {
         if (prior == (MATRIX *) NULL)
             class_results_with_ties[classes[i]] ++;
-        else
+        else 
             class_results_with_ties[classes[i]] +=
                  (1.0 / *SUB (prior, classes[i], classes[i]));
         i++;
@@ -536,7 +571,7 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
 
 } /* end "for k_ctr" counting through the k's. */
 
-} /* end "poll" */
+} /* end "xpoll" */
 
 /*=========================  c_euclidean  ==================================*/
 
