@@ -2799,17 +2799,17 @@ print_matrix (xval_result, 8);
         {
             original_eigenvalue   = largest_eigenvalue;
             original_relevant_num = largest_eigenvalue_num;
-            if (verbose > 1)
+            if (verbose > 3)
             {
-                fprintf (stderr, "i: %ld Original (%ld) ", 
+                Rprintf ("i: %ld Original (%ld) ", 
                                  i, largest_eigenvalue_num);
-                fprintf (stderr, " is %f\n", largest_eigenvalue);
+                Rprintf (" is %f\n", largest_eigenvalue);
             }
             if (permute == 0 && original_eigenvalue < improvement 
             &&  *once_out_always_out == TRUE)
             {
-                if (verbose > 1)
-                    fprintf (stderr, "%li is always out!\n", i);
+                if (verbose > 3)
+                    Rprintf ("%li is always out!\n", i);
                 inv_result = -1;
                 delete_this_variable_forever = TRUE;
                 continue;
@@ -2817,7 +2817,7 @@ print_matrix (xval_result, 8);
         }
         else
         {
-            if (verbose > 2)
+            if (verbose > 4)
             {
                 Rprintf ("Permuted (%ld) ", largest_eigenvalue_num);
                 Rprintf (" is %f\n", largest_eigenvalue);

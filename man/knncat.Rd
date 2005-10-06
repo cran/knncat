@@ -88,7 +88,7 @@ variables, Comp. Stat. Data Analysis 28 (1998), 157-169.}
 library(MASS) # Load data set
 syncat <- knncat (synth.tr, classcol=3)
 \dontrun{syncat
-Train set misclass rate: 16.8%
+Train set misclass rate: 12.8%
 synpred <- predict (syncat, synth.tr, synth.te, train.classcol=3,
                     newdata.classcol=3)
 table (synpred, synth.te$yc)
@@ -102,7 +102,7 @@ synpred 0   1
 }
 knncat (synth.tr, synth.te, classcol=3)
 \dontrun{
-Test set misclass rate: 9.5%
+Test set misclass rate: 13.1%
 }
 }
 \author{Samuel E. Buttrey, \email{buttrey@nps.edu}}

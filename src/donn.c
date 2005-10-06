@@ -81,7 +81,6 @@ long j, train_ctr, test_ctr;
 long test_item_count;
 long dist_ctr, move_ctr, k_ctr,
        number_of_nearest,
-       largest_k = -1,
        test_class;
 long how_many_ks = 1, number_of_vars;
 
@@ -93,6 +92,7 @@ static long *nearest_class;
 static long *nearest_neighbor;
 static long *poll_result;
 static long *misclass_with_distance_zero;
+static long largest_k;
 static long slots;
 
 if (*quit == TRUE)
@@ -106,6 +106,7 @@ if (initialized == FALSE)
     for (j = 0; j < how_many_ks; j++)
         if (k[j] > largest_k)
             largest_k = k[j];
+    if (verbose > 0) Rprintf ("Largest k is now %i\n", largest_k);
     
     slots = largest_k + 15;
 
@@ -195,7 +196,7 @@ for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
             } 
     }
     test_item_count++;
-    if (verbose > 3)
+    if (verbose > 3 && test_ctr <= 1)
         Rprintf ("Computing dists for test record %li\n", test_ctr);
 /*
 ** ..zero out the nearest neighbor information...
@@ -206,6 +207,9 @@ for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
         nearest_distance[j] = -1.0;
         nearest_class[j]    = (long) -1;
     }
+    if (test_ctr <= 1 && verbose > 3) 
+        Rprintf ("-1's into all %i slots (largest k is %i)\n",
+            slots, largest_k);
     number_of_nearest = 0;
 /*
 ** ... and compute the distance from this record to each of the training
@@ -221,6 +225,10 @@ for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
         if (*theyre_the_same && test_ctr == train_ctr)
             continue;
             
+if (verbose > 3 && test_ctr <= 1 && train_ctr <= 1)
+    Rprintf ("Test/train %i %i, threshold %f\n", test_ctr, train_ctr,
+                            nearest_distance[largest_k]);
+
         dist = f_euclidean (SUB (training, train_ctr, 1), 
                             SUB (test, test_ctr, 1), phi,
                             SUB (c, 0, 0),
@@ -249,6 +257,8 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
 ** "nearest-neighbor" distances. As soon as a distance gets above that, we
 ** know we can stop this comparison. The function returns -1, and we continue.
 */
+        if (verbose > 3 && test_ctr <= 1 & train_ctr <= 1 && dist < 0)
+            Rprintf ("dist was < 0, skip\n");
         if (dist < 0)
             continue;
 /*
@@ -257,8 +267,8 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
 */
         if (dist < nearest_distance[slots-1] || number_of_nearest < slots)
         {
-            if (verbose > 3 && dist <= nearest_distance[0])
-                printf ("Smallest so far for %li is %li, distance %f\n", 
+            if (verbose > 4 && dist <= nearest_distance[0])
+                Rprintf ("Smallest so far for %li is %li, distance %f\n", 
                          test_ctr, train_ctr, dist);
 /*
 ** Find the spot for this new neighbor. When we find it (and by "the spot"
@@ -318,7 +328,7 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
             poll_result[k_ctr] = 0L;
         }
 
-    if (verbose > 3)
+    if (verbose > 3 && test_ctr <= 1)
     {
         for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
             Rprintf ("nearest_class[k_ctr] is %i...", nearest_class[k_ctr]);
@@ -676,7 +686,12 @@ if (verbose > 4)
 }
 
     if (threshold > 0 && sum > threshold)
+    {
+        if (verbose > 4)
+            Rprintf ("Threshold is %f, which is > 0, and sum is %f\n",
+                threshold, sum);
         return (-1.0);
+    }
 } /* end "for" loop */
 
 return (sum);

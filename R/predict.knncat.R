@@ -4,6 +4,16 @@ function(object, train, newdata, train.classcol = 1, newdata.classcol = 1,
 {
 #
 # Perform knncat-type classification on new data.
+# 
+# Arguments: object: "knncat" object from call to knncat()
+#             train: Training data used to construct object
+#           newdata: Test data to be classified
+#    train.classcol: Number of training set column containing class
+#  newdata.classcol: Number of test set column containing class
+#    return.classes: If TRUE, return classes; if not, just print error rate
+#              more: If TRUE, print error rate
+#           verbose: Diagnostic printing level (default 0)
+#               ...: Other arguments (currently ignored)
 #
 #
 # First ensure that all the predictor variables in the original appear in the

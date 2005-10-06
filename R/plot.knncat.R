@@ -5,6 +5,7 @@ function (x, ...)
 # Plot.knncat: plot method for knncat objects
 #
 # Arguments: x: knncat object, from knncat().
+#          ...: Other arguments, passed to plot()
 #
 y <- unlist (x$phi)
 maxx <- length(x$phi)
@@ -13,7 +14,7 @@ maxx <- length(x$phi)
 #
 ten.pct <- maxx * .10
 plot (c(1-ten.pct, maxx+ten.pct), range(y), xlab = "Variable", ylab = "Phi", 
-      type = "n", axes=FALSE)
+      type = "n", axes=FALSE, ...)
 box ()
 axis (2)
 #

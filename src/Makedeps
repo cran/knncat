@@ -1,0 +1,23 @@
+com.o: com.c ranlib.h
+dodisc.o: dodisc.c matrix.h utils.h ord.h
+donn.o: donn.c matrix.h utils.h ord.h donn.h
+donnwrap.o: donnwrap.c matrix.h utils.h ord.h donn.h
+dsort.o: dsort.c
+linpack.o: linpack.c
+matrix.o: matrix.c utils.h matrix.h h:/r/include/R.h \
+  h:/r/include/Rconfig.h h:/r/include/R_ext/Arith.h \
+  h:/r/include/R_ext/libextern.h h:/r/include/R_ext/Boolean.h \
+  h:/r/include/R_ext/Complex.h h:/r/include/R_ext/Constants.h \
+  h:/r/include/R_ext/Error.h h:/r/include/R_ext/Memory.h \
+  h:/r/include/R_ext/Print.h h:/r/include/R_ext/Random.h \
+  h:/r/include/R_ext/Utils.h h:/r/include/R_ext/RS.h
+objective.o: objective.c matrix.h utils.h ord.h
+ords.o: ords.c matrix.h utils.h ord.h ordfuncs.h donn.h dodisc.h \
+  h:/r/include/R.h h:/r/include/Rconfig.h h:/r/include/R_ext/Arith.h \
+  h:/r/include/R_ext/libextern.h h:/r/include/R_ext/Boolean.h \
+  h:/r/include/R_ext/Complex.h h:/r/include/R_ext/Constants.h \
+  h:/r/include/R_ext/Error.h h:/r/include/R_ext/Memory.h \
+  h:/r/include/R_ext/Print.h h:/r/include/R_ext/Random.h \
+  h:/r/include/R_ext/Utils.h h:/r/include/R_ext/RS.h
+ranlib.o: ranlib.c ranlib.h
+utilsR.o: utilsR.c utils.h

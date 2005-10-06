@@ -3,10 +3,11 @@
 \title{Plot a knncat classifier}
 \description{Plot a knncat classifier}
 \usage{
-\method{plot}{knncat}{x, \dots}
+\method{plot}{knncat}(x, \dots)
 }
 \arguments{
 \item{x}{Knncat object, from \link{knncat}}
+\item{\dots}{Other arguments, passed to \link{plot}}
 }               
 \keyword{models}
 \details{This plot shows all the estimated numnbers associated with each
