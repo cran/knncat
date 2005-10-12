@@ -38,8 +38,8 @@ void do_nothing();
 #include "dodisc.h"
 #include "R.h"
 
-long long_TRUE  = (long) TRUE;
-long long_FALSE = (long) FALSE;
+Slong Slong_TRUE  = (Slong) TRUE;
+Slong Slong_FALSE = (Slong) FALSE;
 long zero       = 0L;
 long one        = 1L;
 
@@ -88,9 +88,8 @@ MATRIX *phi = (MATRIX *) NULL;
 
 long *am_i_in;               /* Keeps track of what variables are in.  */
 long am_i_in_ctr;            /* Keeps track of variable rankings.      */
-long *last_cum_cats_this_subset;
-long *cum_cats_this_subset;  /*                                        */
-long *cats_in_var;           /* Ith entry: num of levels in var i      */
+Slong *cum_cats_this_subset;  /*                                        */
+Slong *cats_in_var;           /* Ith entry: num of levels in var i      */
 long current_cat_total;
 long currently_ordered;      /* Number of variables in the current subset */
                              /* which are ordered                         */
@@ -99,7 +98,7 @@ long orderable_cats;         /* Number of cats in the current subset's    */
                              /* ordered variables                         */
 int all_unordered;
 int all_numeric;
-long theyre_the_same = FALSE; /* Are training and test sets identical? */
+Slong theyre_the_same = FALSE; /* Are training and test sets identical? */
 int delete_this_variable_forever = TRUE;
 
 int classification = CLASSIFICATION;
@@ -149,9 +148,9 @@ MATRIX *original_margin_holder, *permuted_margin_holder;
 ** + 1) columns.
 */
 long number_of_vars;
-long *increase;
+Slong *increase;
 
-long number_of_classes = 0L;     /* Number of classes. You guessed that. */
+Slong number_of_classes = 0L;    /* Number of classes. You guessed that. */
 
 long permute, permute_tail;
 /*
@@ -170,7 +169,7 @@ double smallest_misclass_error;
 long smallest_misclass_dim, smallest_misclass_k;
 MATRIX *misclass_mat;
 
-long verbose = 0;
+Slong verbose = 0;
 
 /*============================= ord ==================================*/
 void ord (double *traindata, Slong *trainrows, Slong *traincols,
@@ -194,22 +193,22 @@ long var_ctr;                /*                                        */
 long permute_ctr;            /*                                        */
 long permute_len;            /*                                        */
 long *cum_cats_before_var;   /* Ith : # of categories in vars 1-(i-1)  */
-long *cum_cats_ptr;          /*                                        */
+Slong *cum_cats_ptr;         /*                                        */
 long *number_in_class;       /*                                        */
 long *number_in_class_ptr;   /*                                        */
 long total_number_of_cats;   /* Number of levels in all categories     */
 long *permute_indices;       /*                                        */
 MATRIX *c;                   /*                                        */
 double *misclass_rate;       /*                                        */
-long *k, best_k;
+Slong *k, best_k;
 long row_ctr;
-long prior_ind;
+Slong prior_ind;
 long dimension = 0L;
 int first_time_through;
 int do_the_omission = 0;
 int do_nn_result, get_seq_result;
 long xval_ceiling;
-long *return_classes = (long *) NULL;
+Slong *return_classes = (Slong *) NULL;
 
 #define null_mat     (MATRIX *) NULL
 /* Matrices for discrimination stuff. */
@@ -238,34 +237,34 @@ permute            = (long) *in_permute;
 permute_tail       = (long) *in_permute_tail;
 ridge              = *in_ridge;               /* this is double */
 k_len              = (long) *in_k_len;
-best_k             = (long ) *in_best_k;
+best_k             = (Slong) *in_best_k;
 
 /* Loop over the vector of nn's to fill k */
-alloc_some_longs (&k, k_len);
+alloc_some_Slongs (&k, k_len);
 for (i = 0; i < k_len; i++)
-    k[i] = (long) in_k[i];
+    k[i] = (Slong) in_k[i];
 xvals              = (long) *in_xvals;
 classification     = (long) *in_classification;
 improvement        = *in_improvement;         /* this is double */
 
 number_of_vars    = (long) *traincols - 1;
 /* Loop over the set of columns to fill these two */
-alloc_some_longs (&cats_in_var, number_of_vars);
-alloc_some_longs (&increase, number_of_vars);
+alloc_some_Slongs (&cats_in_var, number_of_vars);
+alloc_some_Slongs (&increase, number_of_vars);
 for (i = 0; i < number_of_vars; i++)
 {
     cats_in_var[i] = in_cats_in_var[i];
     increase[i]    = in_increase[i];
 }
 /* Loop over the set of classes to fill number_in_class */
-number_of_classes = (long) *in_number_of_classes;
-alloc_some_longs (&number_in_class, number_of_classes);
+number_of_classes = (Slong) *in_number_of_classes;
+alloc_some_longs (&number_in_class, (long) number_of_classes);
 for (i = 0; i < number_of_classes; i++)
     number_in_class[i] = in_number_in_class[i];
 
 priordata          = in_priordata;            /* this is double */
-prior_ind          = (long) *in_prior_ind;
-verbose            = (long) *in_verbose;
+prior_ind          = (Slong) *in_prior_ind;
+verbose            = (Slong) *in_verbose;
 once_out_always_out = (long *) in_once_out_always_out;
 *status            = (Slong) 0;
 
@@ -284,13 +283,12 @@ else
 alloc_some_longs (&permute_indices, train_n);
 alloc_some_longs (&xval_indices, train_n);
 alloc_some_longs(&cum_cats_before_var, number_of_vars);
-alloc_some_longs(&cum_cats_this_subset, number_of_vars);
-alloc_some_longs(&last_cum_cats_this_subset, number_of_vars);
+alloc_some_Slongs(&cum_cats_this_subset, number_of_vars);
 alloc_some_doubles(&missing_values, number_of_vars);
 for (cat_ctr = 0L; cat_ctr < number_of_vars; cat_ctr++)
 {
     cum_cats_before_var [cat_ctr] = 0L;
-    cum_cats_this_subset[cat_ctr] = 0L;
+    cum_cats_this_subset[cat_ctr] = (Slong) 0;
 }
 alloc_some_longs(&am_i_in, number_of_vars);
 training = make_matrix ((long) train_n, number_of_vars + 1, 
@@ -403,7 +401,7 @@ for (xval_ctr = 0L; xval_ctr < xvals; xval_ctr++)
 ** Fill "permute_indices" with the indices of all the training set
 ** items that are in this cross-validation group.
 */
-if (verbose > 0)
+if (verbose > 1)
     Rprintf ("Top of xval loop, this is %i of %i\n", xval_ctr, xvals);
 permute_ctr = 0L;
 for (row_ctr = 0; row_ctr < train_n; row_ctr++)
@@ -477,7 +475,7 @@ smallest_misclass_error =  matrix_min (xval_result, &smallest_misclass_dim,
 
 if (verbose > 1)
     fprintf (stderr, "Best rate is with %li dims and %li nn's\n",
-                     smallest_misclass_dim, k[smallest_misclass_k]);
+                     smallest_misclass_dim, (long) k[smallest_misclass_k]);
 
 xval_indices = (long *) NULL;
 train_n_effective = train_n;
@@ -542,12 +540,12 @@ if (classification == CLASSIFICATION)
 */
     if (test_n == 0)
     {
-        return_classes = &long_FALSE;
-        do_nn_result = do_nn (&long_FALSE, training, training,
+        return_classes = &Slong_FALSE;
+        do_nn_result = do_nn (&Slong_FALSE, training, training,
                      c, &best_k, &one, 
-                     &long_TRUE, /* theyre_the_same */
+                     &Slong_TRUE, /* theyre_the_same */
                      phi->data, cats_in_var,
-                     cum_cats_ptr, knots, cost, prior, 
+                     cum_cats_ptr, knots, cost, &prior_ind, prior, 
                      misclass_rate, misclass_mat, 
                      return_classes, test_classes, 
                      &one, &zero, (long *) NULL, /* <- xval stuff */
@@ -555,12 +553,12 @@ if (classification == CLASSIFICATION)
     }
     else
     {
-        return_classes = &long_TRUE;
-        do_nn_result = do_nn (&long_FALSE, training, test,
+        return_classes = &Slong_TRUE;
+        do_nn_result = do_nn (&Slong_FALSE, training, test,
                      c, &best_k, &one, 
-                     &long_FALSE, /* theyre_the_same */
+                     &Slong_FALSE, /* theyre_the_same */
                      phi->data, cats_in_var,
-                     cum_cats_ptr, knots, cost, prior, 
+                     cum_cats_ptr, knots, cost, &prior_ind, prior, 
                      misclass_rate, misclass_mat, 
                      return_classes, test_classes, 
                      &one, &zero, (long *) NULL, /* <- xval stuff */
@@ -581,12 +579,12 @@ if (classification == CLASSIFICATION)
                       smallest_misclass_dim + 1, misclass_rate[0]);
 
 /* Now call with "quit" set to TRUE to free up memory */
-    return_classes = &long_FALSE;
-    do_nn (&long_TRUE, training, test, c, &(k[smallest_misclass_k]), &one, 
-        &long_FALSE, phi->data, cats_in_var, cum_cats_ptr, knots, cost, 
-        prior, misclass_rate, misclass_mat, FALSE, (Slong *) NULL,
+    return_classes = &Slong_FALSE;
+    do_nn (&Slong_TRUE, training, test, c, &(k[smallest_misclass_k]), &one, 
+        &Slong_FALSE, phi->data, cats_in_var, cum_cats_ptr, knots, cost, 
+        &prior_ind, prior, misclass_rate, misclass_mat, FALSE, (Slong *) NULL,
         (long *) NULL, (long *) NULL, (long *) NULL,
-        (long *) NULL, (long *) NULL, (long *) NULL);
+        (Slong *) NULL, (Slong *) NULL, (Slong *) NULL);
 
     free (knots);
 
@@ -658,9 +656,9 @@ for (i = 0L; i < how_many; i++)
 /*============================== fill_margin_holder ======================*/
 int fill_margin_holder (MATRIX *margin_holder, long *permute_index, 
                     long which,
-                    MATRIX *data, long *cats_in_var, 
-                    double **knots, long *cum_cats_this_subset, 
-                    long *number_in_class, long *increase)
+                    MATRIX *data, Slong *cats_in_var, 
+                    double **knots, Slong *cum_cats_this_subset, 
+                    long *number_in_class, Slong *increase)
 /*
 ** Here we fill up the "margin_holder" matrix. For a categorical
 ** variable, this holds what you expect; the entry in the i-th row associated 
@@ -838,7 +836,7 @@ return TRUE;
 } /* end "fill_margin_holder" */
 
 /*============================ fill_u ===================================*/
-int fill_u (MATRIX *training, long *cats_in_var, long *cum_cats_this_subset,
+int fill_u (MATRIX *training, Slong *cats_in_var, Slong *cum_cats_this_subset,
         long *number_in_class, MATRIX *margin_ptr)
 {
 long cat_row_ctr;
@@ -858,8 +856,8 @@ return (TRUE);
 /*===================== fill_row_of_u_submatrices ========================*/
 
 int fill_row_of_u_submatrices (MATRIX *training,
-    long starting_row, long *cats_in_var,
-    long *cum_cats_this_subset, long *number_in_class, MATRIX *margin_ptr)
+    long starting_row, Slong *cats_in_var,
+    Slong *cum_cats_this_subset, long *number_in_class, MATRIX *margin_ptr)
 {
 long row_ctr, big_col_ctr, col_ctr;
 long col_start, row_start;
@@ -912,8 +910,8 @@ return (TRUE);
 /*=======================  fill_w ======================================*/
 
 int fill_w (MATRIX *training,
-        double **knots, long *cats_in_var, long *cum_cats_this_subset, 
-        MATRIX *margin_ptr, long i, long *permute_indices, long *increase)
+        double **knots, Slong *cats_in_var, Slong *cum_cats_this_subset, 
+        MATRIX *margin_ptr, long i, long *permute_indices, Slong *increase)
 {
 long cat_row_ctr;
 
@@ -931,9 +929,9 @@ return (TRUE);
 
 /*===================== fill_row_of_w_submatrices ========================*/
 int fill_row_of_w_submatrices (MATRIX *training,
-    long starting_row, double **knots, long *cats_in_var,
-    long *cum_cats_this_subset, MATRIX *margin_ptr, long which_to_permute,
-    long *permute_indices, long *increase)
+    long starting_row, double **knots, Slong *cats_in_var,
+    Slong *cum_cats_this_subset, MATRIX *margin_ptr, long which_to_permute,
+    long *permute_indices, Slong *increase)
 {
 long j, train_n;
 long col_ctr, knot_row_ctr, knot_col_ctr;
@@ -1307,8 +1305,8 @@ return (TRUE);
 
 /*====================== add_ordered_variable =========================*/
 double add_ordered_variable (double *result, long which_var, 
-                      long dimension, long *cats_in_var, MATRIX *phi,
-                      long *increase)
+                      long dimension, Slong *cats_in_var, MATRIX *phi,
+                      Slong *increase)
 {
 /*
 ** Each ordered variable requires (# of cats) lin. constraints. (# of cats - 1)
@@ -1695,7 +1693,7 @@ return (objective_result);
 
 /*====================== deal_with_missing_values =========================*/
 void deal_with_missing_values (MATRIX *training, double missing_max, 
-                              long *increase, long *cats_in_var, 
+                              Slong *increase, Slong *cats_in_var, 
                               double *missing_values)
 {
 /*
@@ -1901,14 +1899,14 @@ return (0);
 int get_a_solution (long permute_ctr, long *permute_indices,
                     long permute_len, long current_var, 
                     MATRIX *margin_ptr, MATRIX *training, 
-                    long *cats_in_var, long *cum_cats_this_subset, 
+                    Slong *cats_in_var, Slong *cum_cats_this_subset, 
                     double **knots,
                     long *number_in_class, MATRIX *eigenval_ptr, 
                     MATRIX *eigenvec_ptr, MATRIX *w_inv_m, double local_ridge, 
                     int classification, long number_of_vars, int dimension, 
-                    long current_cat_total, MATRIX **prior, int prior_ind, 
+                    long current_cat_total, MATRIX **prior, Slong prior_ind, 
                     int number_of_classes, int first_time_through, 
-                    int do_the_omission, long *increase, int quit)
+                    int do_the_omission, Slong *increase, int quit)
 {
 /* static MATRIX *u; */
 static MATRIX *eigenvalues_imaginary, *eigenvalues_beta;
@@ -2147,7 +2145,7 @@ return (TRUE);
 void count_them_cats (long number_of_vars, 
                      long *current_cat_total, long *currently_ordered, 
                      long *currently_numeric,
-                     long *orderable_cats, MATRIX *c, long *increase)
+                     long *orderable_cats, MATRIX *c, Slong *increase)
 {
 long var_ctr;
 
@@ -2182,7 +2180,7 @@ int do_the_discriminant_thing (long permute_ctr,
        MATRIX *eigenval_ptr, MATRIX *eigenvec_ptr, MATRIX *original_w_inv_m_mat,
        MATRIX *prior, long i, 
        long number_of_vars, int dimension, 
-       long current_cat_total, int do_the_omission, long *increase)
+       long current_cat_total, int do_the_omission, Slong *increase)
 {
 static MATRIX *temp_w, *reduced_w, *w_ptr;
 static MATRIX *w_inv_m_mat = null_mat,
@@ -2371,14 +2369,14 @@ return (TRUE);
 /*========================= get_sequence_of_solutions ===================*/
 int get_sequence_of_solutions (long quit_dimension,
     long number_of_vars, long permute, long permute_len, long *permute_indices,
-    double improvement, long k_len, long *k,
-    long *cats_in_var, long *cum_cats_ptr, MATRIX *c,
+    double improvement, long k_len, Slong *k,
+    Slong *cats_in_var, Slong *cum_cats_ptr, MATRIX *c,
     MATRIX **original_eigenvectors, MATRIX **original_w_inv_m_mat,
     long *number_in_class, 
     long xval_ctr,
     MATRIX *xval_result, long *xval_ceiling,
-    MATRIX *cost, MATRIX *prior, long prior_ind, long number_of_classes,
-    double *misclass_rate, int do_the_omission, long *increase,
+    MATRIX *cost, MATRIX *prior, Slong prior_ind, Slong number_of_classes,
+    double *misclass_rate, int do_the_omission, Slong *increase,
     long *once_out_always_out)
 {
 double biggest_permuted_eigenval, last_eigenvalue;
@@ -2394,7 +2392,7 @@ int cat_ctr, var_ctr, k_ctr, permute_ctr;
 int inv_result, do_nn_result;
 int get_soln_result;
 MATRIX *margin_ptr;
-long *return_classes = (long *) NULL;
+Slong *return_classes = (Slong *) NULL;
 
 /* MATRIX *original_w_inv_m_mat; */
 
@@ -2603,12 +2601,13 @@ if (first_time_through)
                                number_of_classes, 
                                "Misclass mat", REGULAR, ZERO_THE_MATRIX);
 ***/
-                return_classes = &long_FALSE;
-                do_nn_result = do_nn (&long_FALSE, training, training,
-                   c, k, &k_len, &long_TRUE, /* theyre_the_same */
+                return_classes = &Slong_FALSE;
+                do_nn_result = do_nn (&Slong_FALSE, training, training,
+                   c, k, &k_len, &Slong_TRUE, /* theyre_the_same */
                    SUB (best_eigenvector, 0L, 0L),
                    cats_in_var, cum_cats_ptr, knots, cost,
-                   prior, misclass_rate, NULL, return_classes, (Slong *) NULL,
+                   &prior_ind, prior, misclass_rate, NULL, return_classes, 
+                   (Slong *) NULL,
                    &xval_lower, &xval_upper, xval_indices,
                    increase, &number_of_classes, &verbose);
                if (do_nn_result == FALSE)
@@ -2945,11 +2944,11 @@ free (current_eigenvalue);
 /* free (am_i_in); */
 
 get_a_solution ((long) NULL, (long *) NULL, (long) NULL, (long) NULL, 
-    (MATRIX *) NULL, (MATRIX *) NULL, (long *) NULL, (long *) NULL, 
+    (MATRIX *) NULL, (MATRIX *) NULL, (Slong *) NULL, (Slong *) NULL, 
     (double **) NULL, (long *) NULL, (MATRIX *) NULL, (MATRIX *) NULL, 
     (MATRIX *) NULL, (double) 0, classification, (long) NULL, (int) NULL, 
     (long)  NULL, (MATRIX **) NULL, (int)  NULL, (int)  NULL, (int)  NULL, 
-    (int) NULL, (long *) NULL, TRUE /* quit */);
+    (int) NULL, (Slong *) NULL, TRUE /* quit */);
 
 return (TRUE);
 

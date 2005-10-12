@@ -45,10 +45,10 @@
 /*
 ** Defines for prior probabilities
 */
-#define ESTIMATED      1
-#define ALL_EQUAL      2
-#define SUPPLIED       3
-#define IGNORED        4
+#define ESTIMATED      (Slong) 1
+#define ALL_EQUAL      (Slong) 2
+#define SUPPLIED       (Slong) 3
+#define IGNORED        (Slong) 4
 
 /* Knots per (numeric) variable */
 #define KNOTS  5L

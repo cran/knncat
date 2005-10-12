@@ -7,7 +7,7 @@
 }
 \arguments{
 \item{x}{Knncat object, from \link{knncat}}
-\item{\dots}{Other arguments, passed to \link{plot}}
+\item{\dots}{Other arguments, currently ignored}
 }               
 \keyword{models}
 \details{This plot shows all the estimated numnbers associated with each

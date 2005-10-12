@@ -4,16 +4,6 @@ function(object, train, newdata, train.classcol = 1, newdata.classcol = 1,
 {
 #
 # Perform knncat-type classification on new data.
-# 
-# Arguments: object: "knncat" object from call to knncat()
-#             train: Training data used to construct object
-#           newdata: Test data to be classified
-#    train.classcol: Number of training set column containing class
-#  newdata.classcol: Number of test set column containing class
-#    return.classes: If TRUE, return classes; if not, just print error rate
-#              more: If TRUE, print error rate
-#           verbose: Diagnostic printing level (default 0)
-#               ...: Other arguments (currently ignored)
 #
 #
 # First ensure that all the predictor variables in the original appear in the
@@ -67,6 +57,7 @@ cats.in.var <- sapply (object$phi, length)
 cum.cats.this.subset <- c(0, cumsum (cats.in.var)[-length(cats.in.var)])
 cdata <- rep (1, ncol.train - 1)
 phidata <- unlist (object$phi)
+prior.ind <- object$prior.ind
 priordata <- object$prior
 number.of.classes <- length(priordata)
 if (any (names(object) == "knot.values"))
@@ -86,7 +77,8 @@ thang <- .C ("donnwrap",
     as.double (train), as.integer(nrow.train), as.integer(ncol.train),
     as.double (newdata), as.integer(nrow.newdata), as.integer(ncol.newdata),
     as.integer (cats.in.var), as.integer(cum.cats.this.subset),
-    as.double (cdata), as.double (phidata), as.double (priordata), 
+    as.double (cdata), as.double (phidata), as.integer (prior.ind), 
+    as.double (priordata), 
     as.integer (number.of.classes), as.integer (increase), 
     as.double (knots), rate = as.double (error.rate), 
     as.integer (object$best.k),

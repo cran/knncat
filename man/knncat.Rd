@@ -94,8 +94,8 @@ synpred <- predict (syncat, synth.tr, synth.te, train.classcol=3,
 table (synpred, synth.te$yc)
        
 synpred 0   1  
-      0 466  61
-      1  34 439
+      0 460  91
+      1  40 409
 #
 # Or do the whole thing in one pass:
 #

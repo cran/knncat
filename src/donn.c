@@ -23,17 +23,18 @@ void do_nothing();
 #endif
 
 long verbose;
+long save_verbose;
 long global_test_ctr;
 long number_of_classes;
 long *xval_indices;
 long xval_lower;
 long xval_upper;
-long *increase;
+Slong *increase;
 
 double c_euclidean (double *, double *, double *, long, double);
 double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c, 
-                    long n, double threshold, long *cats_in_var, 
-                    long *cum_cats,
+                    long n, double threshold, Slong *cats_in_var, 
+                    Slong *cum_cats,
                     MATRIX *prior, double **knots);
 double c_absolute (double *, double *, double *, long, double);
 
@@ -41,19 +42,19 @@ double c_absolute (double *, double *, double *, long, double);
 static double *class_results;
 static double *class_results_with_ties;
 static int *tie_marker;
-void xpoll (long *classes, double *distances, long *k, long how_many_ks,
+void xpoll (long *classes, double *distances, Slong *k, long how_many_ks,
           long largest_k, long slots, MATRIX * prior, long *outcome);
 /*=========================== do_nn =================================*/
 
-int do_nn (long *quit, MATRIX *training, MATRIX *test, 
-           MATRIX *c, long *k, long *in_how_many_ks, 
-           long *theyre_the_same, double *phi, long *cats_in_var, 
-           long *cum_cats_this_subset,
-           double **knots,
-           MATRIX *cost, MATRIX *prior, double *error_rates,
-           MATRIX *misclass_mat, long *return_classes, Slong *classes,
+int do_nn (Slong *quit, MATRIX *training, MATRIX *test, 
+           MATRIX *c, Slong *k, long *in_how_many_ks, 
+           Slong *theyre_the_same, double *phi, Slong *cats_in_var, 
+           Slong *cum_cats_this_subset,
+           double **knots, MATRIX *cost, 
+           Slong *prior_ind, MATRIX *prior, double *error_rates,
+           MATRIX *misclass_mat, Slong *return_classes, Slong *classes,
            long *in_xval_lower, long *in_xval_upper, long *in_xval_indices,
-           long *in_increase, long *in_number_of_classes, long *in_verbose)
+           Slong *in_increase, Slong *in_number_of_classes, Slong *in_verbose)
 {
 /*
 ** This deluxe version of do_nn became necessary when we started to
@@ -82,7 +83,7 @@ long test_item_count;
 long dist_ctr, move_ctr, k_ctr,
        number_of_nearest,
        test_class;
-long how_many_ks = 1, number_of_vars;
+long how_many_ks, number_of_vars;
 
 double dist;
 
@@ -98,6 +99,9 @@ static long slots;
 if (*quit == TRUE)
     initialized = TRUE;
 
+if (*prior_ind == IGNORED)
+    prior = (MATRIX *) NULL;
+
 how_many_ks       = *in_how_many_ks;
 
 if (initialized == FALSE)
@@ -106,7 +110,6 @@ if (initialized == FALSE)
     for (j = 0; j < how_many_ks; j++)
         if (k[j] > largest_k)
             largest_k = k[j];
-    if (verbose > 0) Rprintf ("Largest k is now %i\n", largest_k);
     
     slots = largest_k + 15;
 
@@ -257,7 +260,7 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
 ** "nearest-neighbor" distances. As soon as a distance gets above that, we
 ** know we can stop this comparison. The function returns -1, and we continue.
 */
-        if (verbose > 3 && test_ctr <= 1 & train_ctr <= 1 && dist < 0)
+        if (verbose > 3 && test_ctr <= 1 && train_ctr <= 1 && dist < 0)
             Rprintf ("dist was < 0, skip\n");
         if (dist < 0)
             continue;
@@ -344,8 +347,18 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
                 nearest_class[j], nearest_distance[j]);
         }
     }
+    save_verbose = verbose;
+    if (verbose >= 2 && test_ctr <= 1) verbose = 4;
+    if (verbose >= 4)
+    {
+        if (prior == (MATRIX *) NULL)
+            Rprintf ("About to call xpoll, and prior is so very NULL\n");
+        else
+            Rprintf ("About to call xpoll, and prior is so very *not* NULL\n");
+}
     xpoll (nearest_class, nearest_distance, k, how_many_ks, 
           largest_k, slots, prior, poll_result);
+    verbose = save_verbose;
 
     if (verbose >= 2 && test_ctr <= 1)
     {
@@ -379,11 +392,15 @@ double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c,
                     += *SUB (cost, test_class, poll_result[k_ctr]);
             if (nearest_distance[0] == 0.0) 
                 misclass_with_distance_zero[k_ctr]++;
-            if (verbose > 2 && *theyre_the_same == FALSE)
+            if (test_ctr <= 1 && verbose > 2 && *theyre_the_same == FALSE) {
                 Rprintf (
-"k = %ld: Classif.err test rec. %li (a %li) as %li (nearest: %li, dist. %f)\n", 
+"k = %ld: Classif.err test rec. %li (a %li) as %li (nearest: %li, dist. %f)", 
                 k[k_ctr], test_ctr, test_class, (long) poll_result[k_ctr],
                 (long) nearest_neighbor[0], nearest_distance[0]);
+                Rprintf ("(next: %li, dist. %f), (next: %li, dist. %f)\n",
+                (long) nearest_neighbor[1], nearest_distance[1],
+                (long) nearest_neighbor[2], nearest_distance[2]);
+                }
         }
         else
         {
@@ -429,7 +446,7 @@ return (TRUE);
 } /* end "do_nn." */
 
 /*============================  poll  =====================================*/
-void xpoll (long *classes, double *distances, long *k, long how_many_ks,
+void xpoll (long *classes, double *distances, Slong *k, long how_many_ks,
           long largest_k, long slots, MATRIX * prior, long *outcome)
 {
 int i, k_ctr;
@@ -489,12 +506,24 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
     {
         class_results[i] = 0.0;
     }
+if (verbose >= 4)
+Rprintf ("Number of classes is %li\n", number_of_classes);
+if (verbose >= 4)
+Rprintf ("First two class results are %f and %f\n",
+class_results[0], class_results[1]);
     
 /* ...and go through the neighbors to fill it up again. When classes[i]
 ** = j, add one to the j-th entry of class_results. Well, not one,
 ** exactly; if priors isn't NULL, add 1/(that class' prior). That
 ** way, classes with large priors contribute less. Which is as it should be.
 */
+if (verbose >= 4)
+{
+    if (prior == (MATRIX *) NULL)
+        Rprintf ("By the way, prior is so very NULL\n");
+    else
+        Rprintf ("By the way, prior is so very *not* NULL\n");
+}
     for (i = 0; i < k[k_ctr]; i++)
     {
         if (prior == (MATRIX *) NULL)
@@ -503,6 +532,9 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
             class_results[classes[i]] +=
                  (1.0 / *SUB (prior, classes[i], classes[i]));
     }
+if (verbose >= 4)
+Rprintf ("First two class results are %f and %f\n",
+class_results[0], class_results[1]);
 /*
 ** Okay. It could happen that some other neighbors are tied
 ** with the kth one. We would know that if their distances equalled the
@@ -560,11 +592,16 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
 
     if (tie == 0)
     {
+if (verbose > 2)
+    Rprintf ("Max class was %li, putting that in outcome %li\n",
+    max_class, k_ctr);
+
         outcome[k_ctr] = max_class;
         continue;
     }
 
-/**** printf ("Got a tie.\n"); ****/
+if (verbose > 2)
+    Rprintf ("Got a tie.\n");
 /* Make a note of all tied classes.... */
     for (i = 0; i < number_of_classes; i ++)
     {
@@ -606,8 +643,8 @@ return (sum);
 
 /*=========================  f_euclidean  ==================================*/
 double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c, 
-                    long n, double threshold, long *cats_in_var, 
-                    long *cum_cats_this_subset,
+                    long n, double threshold, Slong *cats_in_var, 
+                    Slong *cum_cats_this_subset,
                     MATRIX *prior, double **knots)
 {
 long col_ctr, knot_ctr, offset;

@@ -5,7 +5,6 @@ function (x, ...)
 # Print.knncat: print method for knncat objects.
 #
 #  Arguments: x: a knncat classifier, from knncat()
-#           ...: any other arguments (currently ignored)
 #
 # Right now all this does is print the error rate.
 #

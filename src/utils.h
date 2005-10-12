@@ -4,6 +4,12 @@
 **	Includes handy defines for general use
 **
 */
+#ifdef CALL_FROM_R
+#define Slong int
+#else
+#define Slong long
+#endif
+
 #define TRUE  1
 #define FALSE 0
 #define NOT   !
@@ -29,6 +35,7 @@ int alloc_some_doubles (double **my_array, unsigned long how_many);
 int alloc_some_floats (float **my_array, unsigned long how_many);
 int alloc_some_long_ptrs (long ***my_array, unsigned long how_many);
 int alloc_some_longs (long **my_array, unsigned long how_many);
+int alloc_some_Slongs (Slong **my_array, unsigned long how_many);
 int alloc_some_u_longs (unsigned long **my_array, unsigned long how_many);
 int alloc_some_ints (int **my_array, unsigned long how_many);
 int alloc_some_char_ptrs (char ***my_array, unsigned long how_many);

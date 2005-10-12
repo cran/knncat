@@ -15,9 +15,9 @@ void matrix_element_divide (MATRIX *result, MATRIX *num, MATRIX *denom);
 
 int fill_margin_holder (MATRIX *margin_holder, long *permute_index, 
                         long which,
-                        MATRIX *data, long *cats_in_var, 
-                        double **knots, long *cum_cats_this_subset, 
-                        long *number_in_class, long *increase);
+                        MATRIX *data, Slong *cats_in_var, 
+                        double **knots, Slong *cum_cats_this_subset, 
+                        long *number_in_class, Slong *increase);
 
 void constraint (long *mode,  long *how_many, long *vars, long *nrow,
                  double *x, double *value, double *jacobian, long *nstate);
@@ -26,22 +26,22 @@ void objective (long *mode, long *n, double *x, double *objvalue,
                 double *gradient, long *nstate);
 
 int fill_u (MATRIX *training,
-            long *cats_in_var, long *cum_cats_this_subset,
+            Slong *cats_in_var, Slong *cum_cats_this_subset,
             long *number_in_class, MATRIX *margin_ptr);
 
 int fill_row_of_u_submatrices (MATRIX *training,
-    long starting_row, long *cats_in_var,
-    long *cum_cats_this_subset, long *number_in_class, MATRIX *margin_ptr);
+    long starting_row, Slong *cats_in_var,
+    Slong *cum_cats_this_subset, long *number_in_class, MATRIX *margin_ptr);
 
 int fill_w (MATRIX *training,
-        double **knots, long *cats_in_var, long *cum_cats_this_subset, 
+        double **knots, Slong *cats_in_var, Slong *cum_cats_this_subset, 
         MATRIX *margin_ptr, long i, 
-        long *permute_indices, long *increase);
+        long *permute_indices, Slong *increase);
 
 int fill_row_of_w_submatrices (MATRIX *training,
-    long starting_row, double **knots, long *cats_in_var,
-    long *cum_cats_this_subset, MATRIX *margin_ptr, long which_to_permute,
-    long *permute_indices, long *increase);
+    long starting_row, double **knots, Slong *cats_in_var,
+    Slong *cum_cats_this_subset, MATRIX *margin_ptr, long which_to_permute,
+    long *permute_indices, Slong *increase);
 
 int divide_by_root_before_and_after (MATRIX *in, MATRIX *diag);
 
@@ -57,11 +57,11 @@ int adjust_column (unsigned long column, MATRIX *adjustee, long increase,
 int handle_fascinating_file (FILE *fascinating_file, int *are_any_numeric);
 
 double add_ordered_variable (double *result, long which_var, long dimension,
-                      long *cats_in_var,
-                      MATRIX *eigenvectors, long *increase);
+                      Slong *cats_in_var,
+                      MATRIX *eigenvectors, Slong *increase);
 
 void deal_with_missing_values (MATRIX *training, double missing_max, 
-                              long *increase, long *cats_in_var, 
+                              Slong *increase, Slong *cats_in_var, 
                               double *missing_values);
 
 int insert_missing_values (MATRIX *mat, double missing_max, 
@@ -74,14 +74,14 @@ int do_the_eigen_thing (MATRIX *eigenval_ptr,
 int get_a_solution (long permute_ctr, long *permute_indices, 
                     long permute_len, long i, MATRIX *margin_ptr, 
                     MATRIX *training, 
-                    long *cats_in_var, long *cum_cats_ptr, double **knots,
+                    Slong *cats_in_var, Slong *cum_cats_ptr, double **knots,
                     long *number_in_class, MATRIX *eigenval_ptr, 
                     MATRIX *eigenvec_ptr, MATRIX *w_inv_m, 
                     double ridge, int classification, 
                     long number_of_vars, int dimension, long current_cat_total,
-                    MATRIX **prior, int prior_ind, int prior_len, 
+                    MATRIX **prior, Slong prior_ind, int prior_len, 
                     int first_time_through, int do_the_omission, 
-                    long *increase, int quit);
+                    Slong *increase, int quit);
 
 int prepare_eigen_matrices (
                  MATRIX **original_eigenvalues, MATRIX **original_eigenvectors, 
@@ -94,25 +94,25 @@ int prepare_eigen_matrices (
 void count_them_cats (long number_of_vars,
                      long *current_cat_total, long *currently_ordered, 
                      long *currently_numeric,
-                     long *orderable_cats, MATRIX *c, long *increase);
+                     long *orderable_cats, MATRIX *c, Slong *increase);
 
 int get_sequence_of_solutions (long quit_dimension,
     long number_of_vars, long permute, long permute_len, long *permute_indices,
-    double improvement, long k_len, long *k,
-    long *cats_in_var, long *cum_cats_ptr, MATRIX *c,
+    double improvement, long k_len, Slong *k,
+    Slong *cats_in_var, Slong *cum_cats_ptr, MATRIX *c,
     MATRIX **original_eigenvectors, MATRIX **original_w_inv_m_mat, 
     long *number_in_class, 
     long xval_ctr,
     MATRIX *xval_result, long *xval_ceiling,
-    MATRIX *cost, MATRIX *prior, long prior_ind, long number_of_classes,
-    double *misclass_rate, int do_the_omission, long *increase,
+    MATRIX *cost, MATRIX *prior, Slong prior_ind, Slong number_of_classes,
+    double *misclass_rate, int do_the_omission, Slong *increase,
     long *once_out_always_out);
 
 int do_the_discriminant_thing (long permute_ctr,
        MATRIX *eigenval_ptr, MATRIX *eigenvec_ptr, MATRIX *original_w_inv_m_mat,
        MATRIX *prior, long i, 
        long number_of_vars, int dimension, 
-       long current_cat_total, int do_the_omission, long *increase);
+       long current_cat_total, int do_the_omission, Slong *increase);
 
 
 /* Nag routines for eigenvalues. */

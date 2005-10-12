@@ -26,7 +26,8 @@ void donnwrap (
           double *traindata,  Slong *trainrows,  Slong *traincols,
           double *testdata,  Slong *testrows,  Slong *testcols,
           Slong *cats_in_var, Slong *cum_cats_this_subset,
-          double *cdata, double *phidata, double *priordata,
+          double *cdata, double *phidata, 
+          Slong *prior_ind, double *priordata,
           Slong *number_of_classes, Slong *increase,
           double *in_knots, double *error_rate,
           Slong *best_k, Slong *return_classes, Slong *classes,
@@ -34,7 +35,8 @@ void donnwrap (
 {
 long i;
 MATRIX *training, *test, *c, *cost, *misclass_mat, *prior;
-long quit, how_many_ks, theyre_the_same, xval_lower, xval_upper;
+Slong quit, theyre_the_same; 
+long how_many_ks, xval_lower, xval_upper;
 long knot_ctr, number_of_vars;
 
 double **knots;
@@ -78,7 +80,7 @@ do_nn (&quit, training, test, c, best_k, &how_many_ks,
            &theyre_the_same, phidata, cats_in_var, 
            cum_cats_this_subset,
            knots,
-           (MATRIX *) NULL, prior, error_rate,
+           (MATRIX *) NULL, prior_ind, prior, error_rate,
            (MATRIX *) NULL, return_classes, classes,
            &xval_lower, &xval_upper, (long *) NULL,
            increase, number_of_classes, verbose);
@@ -88,7 +90,7 @@ do_nn (&quit, training, test, c, best_k, &how_many_ks,
            &theyre_the_same, phidata, cats_in_var, 
            cum_cats_this_subset,
            knots,
-           (MATRIX *) NULL, prior, error_rate,
+           (MATRIX *) NULL, prior_ind, prior, error_rate,
            (MATRIX *) NULL, return_classes, classes,
            &xval_lower, &xval_upper, (long *) NULL,
            increase, number_of_classes, verbose);

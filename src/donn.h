@@ -4,13 +4,12 @@
 #define Slong long
 #endif
 
-int do_nn (long *quit, 
-              MATRIX *training, MATRIX *test,     
-              MATRIX *c, long *k, long *how_many_ks, long *theyre_the_same, 
-              double *phi, long *cats_in_var, long *cum_cats_ptr,
-              double **knots, MATRIX *cost, MATRIX *prior,
-              double *error_rates, MATRIX *misclass_mat,
-              long *return_classes, Slong *classes,
-              long *xval_lower, long *xval_upper, long *xval_indices,
-              long *increase, long *number_of_classes, long *verbose);
-
+int do_nn (Slong *quit, MATRIX *training, MATRIX *test, 
+           MATRIX *c, Slong *k, long *in_how_many_ks, 
+           Slong *theyre_the_same, double *phi, Slong *cats_in_var, 
+           Slong *cum_cats_this_subset,
+           double **knots, MATRIX *cost, 
+           Slong *prior_ind, MATRIX *prior, double *error_rates,
+           MATRIX *misclass_mat, Slong *return_classes, Slong *classes,
+           long *in_xval_lower, long *in_xval_upper, long *in_xval_indices,
+           Slong *in_increase, Slong *in_number_of_classes, Slong *in_verbose);

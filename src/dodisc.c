@@ -22,14 +22,14 @@ extern long xval_upper;
 extern long *am_i_in;
 extern long *increase;
 
-double sum_of_phis (long, double *, long *, long *, double **, double *);
+double sum_of_phis (long, double *, Slong *, Slong *, double **, double *);
 int    expand_vector (MATRIX *, MATRIX *, long, long,
-                      long *, double *);
+                      Slong *, double *);
 
 /*=========================== do_discriminant ===========================*/
 
 int do_discriminant (MATRIX *test, MATRIX *eigenvalues, MATRIX *eigenvectors,
-              MATRIX *make_phi, long *cats_in_var, long *cum_cats_this_subset,
+              MATRIX *make_phi, Slong *cats_in_var, Slong *cum_cats_this_subset,
               long dimension, long number_of_variables,
               double **knots, MATRIX *cost, MATRIX *prior, double *error_rate,
               MATRIX *misclass_mat, int do_the_omission)
@@ -239,7 +239,7 @@ return (TRUE);
 
 /*=========================== sum_of_phis ==============================*/
 double sum_of_phis (long number_of_variables, double *phi,
-                    long *cats_in_var, long *cum_cats,
+                    Slong *cats_in_var, Slong *cum_cats,
                     double **knots, double *data)
 {
 long var_ctr, offset;
@@ -276,7 +276,7 @@ return (sum);
 
 /*=========================== expand_vector ==============================*/
 int  expand_vector (MATRIX *new, MATRIX *old, long how_many_holes, 
-                   long number_of_variables, long *holes,
+                   long number_of_variables, Slong *holes,
                    double *filler)
 {
 /*
@@ -330,7 +330,7 @@ hole_ctr = second_var_in;
 
 while (new_ctr < new->ncol)
 {
-    if (holes != (long *) NULL && holes[hole_ctr] == new_ctr)
+    if (holes != (Slong *) NULL && (unsigned long) holes[hole_ctr] == new_ctr)
     {
         if (filler == (double *) NULL)
             new->data[new_ctr] = 0.0;
