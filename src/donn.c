@@ -22,10 +22,10 @@ void do_nothing();
 #define Slong long
 #endif
 
-long verbose;
+Slong verbose;
 long save_verbose;
 long global_test_ctr;
-long number_of_classes;
+Slong number_of_classes;
 long *xval_indices;
 long xval_lower;
 long xval_upper;
@@ -458,17 +458,18 @@ static int initialized = 0;
 
 if (initialized == FALSE)
 {
-    if (alloc_some_doubles (&class_results, number_of_classes) != 0)
+    if (alloc_some_doubles (&class_results, (long) number_of_classes) != 0)
     {
         Rprintf ("Couldn't get %li doubles for poll results; abort\n", 
             number_of_classes);
     }
-    if (alloc_some_doubles (&class_results_with_ties, number_of_classes) != 0)
+    if (alloc_some_doubles (&class_results_with_ties, 
+        (long) number_of_classes) != 0)
     {
         Rprintf ("Couldn't get %li ints for poll results; abort\n", 
             number_of_classes);
     }
-    if (alloc_some_ints (&tie_marker, number_of_classes) != 0)
+    if (alloc_some_ints (&tie_marker, (long) number_of_classes) != 0)
     {
         Rprintf ("Couldn't get %li ints for ties in poll; abort\n", 
             number_of_classes);
@@ -507,7 +508,7 @@ for (k_ctr = 0; k_ctr < how_many_ks; k_ctr++)
         class_results[i] = 0.0;
     }
 if (verbose >= 4)
-Rprintf ("Number of classes is %li\n", number_of_classes);
+Rprintf ("Number of classes is %li\n", (long) number_of_classes);
 if (verbose >= 4)
 Rprintf ("First two class results are %f and %f\n",
 class_results[0], class_results[1]);
