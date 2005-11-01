@@ -13,8 +13,13 @@
 void do_nothing();
 #define free do_nothing
 #endif
+#ifdef CALL_FROM_R
+#define Slong int
+#else
+#define Slong long
+#endif
 
-extern int verbose;
+extern Slong verbose;
 extern long *xval_indices;
 extern long xval_lower;
 extern long xval_upper;

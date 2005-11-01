@@ -22,14 +22,13 @@ void do_nothing();
 #define Slong long
 #endif
 
-Slong verbose;
+extern Slong verbose;
 long save_verbose;
-long global_test_ctr;
-Slong number_of_classes;
-long *xval_indices;
-long xval_lower;
-long xval_upper;
-Slong *increase;
+extern Slong number_of_classes;
+extern long *xval_indices;
+extern long xval_lower;
+extern long xval_upper;
+extern Slong *increase;
 
 double c_euclidean (double *, double *, double *, long, double);
 double f_euclidean (double *vec_1, double *vec_2, double *phi, double *c, 
@@ -189,7 +188,6 @@ test_item_count = 0L;
 */
 for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
 {
-    global_test_ctr = test_ctr;
     if (xval_indices != (long *) NULL)
     {
             if ((xval_lower < xval_upper)

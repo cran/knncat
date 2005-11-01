@@ -81,7 +81,6 @@ MATRIX *test;
 unsigned long test_n  = 0L;
 
 /* extern int errno; */
-int errno;
 
 void constraint (), objective ();
 MATRIX *phi = (MATRIX *) NULL;

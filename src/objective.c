@@ -25,11 +25,16 @@ void do_nothing();
 #define free do_nothing
 #define calloc R_alloc
 #endif
+#ifdef CALL_FROM_R
+#define Slong int
+#else
+#define Slong long
+#endif
 
 MATRIX global_gradient;
 double global_objective_value;
 extern MATRIX *global_copy_of_w, *global_copy_of_u;
-extern int verbose;
+extern Slong verbose;
 
 /*=========================== constraint ===============================*/
 void constraint (long *mode,  long *how_many, long *vars, long *nrow,
