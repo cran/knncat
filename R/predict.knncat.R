@@ -19,19 +19,20 @@ if (length(not.found) > 0)
 # Ensure that the sets of levels match up. This might be stronger than
 # we need.
 #
-train <- data.frame (train[,train.classcol], train[,vars])
+train <- data.frame (train[,train.classcol], train[,vars,drop=FALSE])
 if (is.factor (train[,1]))
     class.labels = levels(train[,1])
 else
     class.labels = seq (0, max(train[,1]))
 if (newdata.classcol <= 0)
-    newdata <- data.frame (class = rep (0, nrow(newdata)), newdata[,vars])
+    newdata <- data.frame (class = rep (0, nrow(newdata)), 
+               newdata[,vars,drop=FALSE])
 else
-    newdata <- data.frame (newdata[,newdata.classcol], newdata[,vars])
+    newdata <- data.frame (newdata[,newdata.classcol], newdata[,vars,drop=FALSE])
 newdata.true.class <- newdata[,1]
 if (any (factor.vars))
 {
-    train.names <- sapply (object$phi[factor.vars], names)
+    train.names <- sapply (object$phi[factor.vars,drop=FALSE], names)
     newdata.names <- sapply (newdata[,vars[factor.vars],drop=FALSE], levels)
     if (!identical (TRUE, all.equal (train.names, newdata.names)))
         stop ("Some level names differ in train and newdata.")
