@@ -1,0 +1,5 @@
+useDynLib("knncat")
+export ("knncat")
+S3method ("print", "knncat")
+S3method ("predict", "knncat")
+S3method ("plot", "knncat")

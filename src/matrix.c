@@ -305,13 +305,11 @@ int set_up_vector (MATRIX *in, int dim, unsigned long item, double *result)
 */
 unsigned long i;		  /* Loop counter.  */
 unsigned long how_many;		  /* Length to copy */
-unsigned long starting_point;	  /* Starting point */
 /*
 ** Figure out how many items to place in result.
 ** Point data at first appropriate item.
 */
 how_many = (dim == ROW? in->ncol: in->nrow);
-starting_point = (dim == ROW? item * in->ncol: item);
 
 /* For a REGULAR matrix, just copy elements one by one. */
 if (in->sym_storage == REGULAR)
@@ -868,6 +866,8 @@ else
 
 /* Count the number of lines (rows) in the file, starting here... */
     status = count_lines (in_file, starting_point, &(mat->nrow));
+/* Right now, this function always returns 0. */
+    if (status != 0) { /* take no action */ }
 
 /* Now count the columns by counting strings of non-spaces in this line. */
     mat->ncol = 0L;
@@ -895,8 +895,9 @@ if (add_intercept)
 /********  DELETED FOR NOW *********
 if (alloc_some_ints (&(mat->columns_in), mat->ncol))
 {
-    fprintf (stderr, "Couldn't allocate %lu doubles for %s: abort\n",
+    sprintf (error_text, "Couldn't allocate %lu doubles for %s: abort\n",
 		      mat->ncol, mat->name);
+    matrix_error (error_text);
     return (-1);
 }
 ********  DELETED FOR NOW *********/
@@ -998,6 +999,7 @@ unsigned long i, j; int k;		 /* Counters			     */
 ** NULL terminator. First, count the number of lines in the file.
 */
 status = count_lines (in_file, 0L, &(mat->nrow));
+if (status != 0) { /* take no action; it always returns 0 */ }
 /*
 ** Now count the number of items on this line; an "item" is a sequence
 ** of characters that isn't blank or tab. So get the first line.
@@ -1283,8 +1285,9 @@ if (allocate_data)
 /********* DELETED FOR NOW **********
     if (alloc_some_ints (&(mat->columns_in), mat->ncol))
     {
-	fprintf (stderr, "Allocation for %lu indicator bytes failed on %s\n",
+	sprintf (error_text, "Allocation for %lu indic. bytes failed on %s\n",
 			  mat->ncol, mat->name);
+        matrix_error (error_text);
 	return (NULL);
     }
     for (i = 0; i < columns; i ++)
@@ -1335,7 +1338,8 @@ unsigned long i,	     /* Loop counter	       */
 mat = (LONG_MATRIX *) calloc (sizeof (MATRIX), 1);
 if (mat == (LONG_MATRIX *) NULL)
 {
-    fprintf (stderr, "Allocation for matrix body failed on %s\n", mat->name);
+    sprintf (error_text, "Alloc. for matrix body failed on %s\n", mat->name);
+    matrix_error (error_text);
     return (NULL);
 }
 
@@ -2599,7 +2603,8 @@ for (i = 0; i < in->nrow; i++)
 
 
 }
-
+/* The provisional_means function only returns 0 for now. */
+if (pm_result != 0) { /* take no action */ }
 return (0);
 } /* end "scale_matrix_rows" */
 

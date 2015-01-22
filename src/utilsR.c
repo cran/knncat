@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "utils.h"
+#include "R.h"
 /* Required for Microsoft? */
 #include <stddef.h>
 
@@ -75,7 +76,7 @@ int alloc_some_double_pointers (double ***my_array, unsigned long how_many)
 /* Allocate "how_many" double pointers in memory. */
 if ( (*my_array = (double **) calloc (how_many, sizeof (double *))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu pointers-to-double\n", how_many);
+    Rprintf ("Unable to alloc %lu pointers-to-double\n", how_many);
     return (-1);
 }
 return (0);
@@ -87,7 +88,7 @@ int alloc_some_doubles (double **my_array, unsigned long how_many)
 /* Allocate "how_many" doubles in memory. */
 if ( (*my_array = (double *) calloc (how_many,  sizeof (double))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu doubles, error %i\n", how_many, errno);
+    Rprintf ("Unable to alloc %lu doubles, error %i\n", how_many, errno);
     return (-1);
 }
 return (0);
@@ -99,7 +100,7 @@ int alloc_some_floats (float **my_array, unsigned long how_many)
 /* Allocate "how_many" floats in memory. */
 if ( (*my_array = (float *) calloc (how_many, sizeof (float))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu floats\n", how_many);
+    Rprintf ("Unable to alloc %lu floats\n", how_many);
     return (-1);
 }
 return (0);
@@ -112,7 +113,7 @@ int alloc_some_long_ptrs (long ***my_array, unsigned long how_many)
 if ( (*my_array = (long **) calloc
 	  (how_many, sizeof (long *))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %li long ptrs\n", how_many);
+    Rprintf ("Unable to alloc %li long ptrs\n", how_many);
     return (-1);
 }
 return (0);
@@ -129,7 +130,7 @@ if ( (*my_array = (long *) calloc (how_many, sizeof (long))) == NULL)
 
 /* 	  (how_many,  (unsigned) sizeof (long))) == NULL) */
 {
-    fprintf (stderr, "Unable to alloc %lu longs\n", how_many);
+    Rprintf ("Unable to alloc %lu longs\n", how_many);
     return (-1);
 }
 return (0);
@@ -145,7 +146,7 @@ if ( (*my_array = (Slong *) calloc (how_many, sizeof (Slong))) == NULL)
 
 /* 	  (how_many,  (unsigned) sizeof (Slong))) == NULL) */
 {
-    fprintf (stderr, "Unable to alloc %lu Slongs\n", how_many);
+    Rprintf ("Unable to alloc %lu Slongs\n", how_many);
     return (-1);
 }
 return (0);
@@ -157,7 +158,7 @@ int alloc_some_u_longs (unsigned long **my_array, unsigned long how_many)
 if ( (*my_array = (unsigned long *) calloc
 	  (how_many, sizeof (unsigned long))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu u_longs\n", how_many);
+    Rprintf ("Unable to alloc %lu u_longs\n", how_many);
     return (-1);
 }
 return (0);
@@ -168,7 +169,7 @@ int alloc_some_ints (int **my_array, unsigned long how_many)
 /* Allocate "how_many" ints in memory. */
 if ( (*my_array = (int *) calloc (how_many, sizeof (int))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu ints\n", how_many);
+    Rprintf ("Unable to alloc %lu ints\n", how_many);
     return (-1);
 }
 return (0);
@@ -179,7 +180,7 @@ int alloc_some_char_ptrs (char ***my_array, unsigned long how_many)
 /* Allocate "how_many" char ptrs in memory. */
 if ( (*my_array = (char **) calloc (how_many,  sizeof (char *))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu char_ptrs\n", how_many);
+    Rprintf ("Unable to alloc %lu char_ptrs\n", how_many);
     return (-1);
 }
 return (0);
@@ -190,7 +191,7 @@ int alloc_some_chars (char **my_array, unsigned long how_many)
 /* Allocate "how_many" char in memory. */
 if ( (*my_array = (char *) calloc (how_many, sizeof (char))) == NULL)
 {
-    fprintf (stderr, "Unable to alloc %lu chars\n", how_many);
+    Rprintf ("Unable to alloc %lu chars\n", how_many);
     return (-1);
 }
 return (0);

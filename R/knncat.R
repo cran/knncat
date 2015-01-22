@@ -70,6 +70,8 @@ most.common <- function (x) {
     names(tbl)[tbl == max(tbl)][1]
 }
 missing.values[factor.vars] <- sapply (train[,-1,drop=FALSE][,factor.vars], most.common)
+empty.levels <- sapply (train, function (x) is.factor (x) && any (table (x) == 0))
+if (any (empty.levels)) stop ("Some factor has empty levels")
 vars.with.na <- sapply (train, function(x) any (is.na(x)))
 if (vars.with.na[1] == TRUE)
     stop ("No missing values allowed in response variable")

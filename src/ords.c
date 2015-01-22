@@ -374,6 +374,7 @@ last_eigenval_mat = make_matrix (0L, 0L, "Last Val", REGULAR, FALSE);
 last_eigenvec_mat = make_matrix (0L, 0L, "Last Vec", REGULAR, FALSE);
 if (classification == DISCRIMINATION)
     last_w_inv_m_mat = make_matrix (0L, 0L, "Last W-inv-M", REGULAR, FALSE);
+    if (last_w_inv_m_mat == (MATRIX *) NULL) { /* do nothing */ }
 
 xval_result = make_matrix (number_of_vars, k_len, "Xval results",
                            REGULAR, ZERO_THE_MATRIX);
@@ -464,16 +465,16 @@ if (dimension == 0)
 
 if (verbose > 1)
 {
-    fprintf (stderr, "Xval result is...\n");
+    Rprintf ("Xval result is...\n");
     print_matrix (xval_result, 8);
-    fprintf (stderr, "Calling matrix_min with ceiling %ld\n", xval_ceiling);
+    Rprintf ("Calling matrix_min with ceiling %ld\n", xval_ceiling);
 }
 
 smallest_misclass_error =  matrix_min (xval_result, &smallest_misclass_dim, 
                                        &smallest_misclass_k, xval_ceiling);
 
 if (verbose > 1)
-    fprintf (stderr, "Best rate is with %li dims and %li nn's\n",
+    Rprintf ("Best rate is with %li dims and %li nn's\n",
                      smallest_misclass_dim, (long) k[smallest_misclass_k]);
 
 xval_indices = (long *) NULL;
@@ -518,7 +519,7 @@ if (classification == CLASSIFICATION)
 
     if (verbose >= 3) 
     {
-        fprintf (stderr, "Optimal phi is...\n");
+        Rprintf ("Optimal phi is...\n");
         print_matrix (phi, 8);
     }
     for (i = 0; i < original_eigenvectors->nrow; i++)
@@ -625,12 +626,12 @@ else
               (smallest_misclass_dim + 1), number_of_vars, knots, cost, prior,
               misclass_rate, misclass_mat, do_the_omission);	
 
-    fprintf (stderr, "D nns %i, dims %i, rate is %f\n",
+    Rprintf ("D nns %i, dims %i, rate is %f\n",
                       0,
                       (int) smallest_misclass_dim + 1, misclass_rate[0]);
 
 /**
-    printf ("Discrimination misclass_rate is %f\n", *misclass_rate);
+    Rprintf ("Discrimination misclass_rate is %f\n", *misclass_rate);
 **/
 }
 
@@ -884,7 +885,7 @@ for (row_ctr = row_start; row_ctr < (row_start + cats_in_var[starting_row]);
             {   
                 if (number_in_class[class_ctr] == 0)
                 {
-                    fprintf (stderr, "Number in class %ld is 0! Abort!\n", 
+                    Rprintf ("Number in class %ld is 0! Abort!\n", 
                                      class_ctr);
                     return (FALSE);
                 }
@@ -892,7 +893,7 @@ for (row_ctr = row_start; row_ctr < (row_start + cats_in_var[starting_row]);
                            * (double)*SUB (margin_ptr, class_ctr, col_ctr)
                            / (double) number_in_class[class_ctr];
 if (verbose >= 4)
-printf ("Row %ld, col %ld, class %ld, adding %f * %f / %ld = %f\n",
+Rprintf ("Row %ld, col %ld, class %ld, adding %f * %f / %ld = %f\n",
 row_ctr, col_ctr, class_ctr, 
 *SUB(margin_ptr, class_ctr, row_ctr), 
 *SUB (margin_ptr, class_ctr, col_ctr), number_in_class[class_ctr], temp);
@@ -1008,7 +1009,7 @@ if (increase[starting_row] == NUMERIC)
                         obs_minus_col_knot = 
 			    obs_col - knots[col_ctr][knot_col_ctr];
 if (verbose > 4)
-printf ("Obs %ld is %f, minus knot %ld %ld -- %f -- gives %f\n",
+Rprintf ("Obs %ld is %f, minus knot %ld %ld -- %f -- gives %f\n",
 j,  *SUB (training, j, col_ctr + 1), col_ctr, knot_col_ctr,
 knots[col_ctr][knot_col_ctr],
 obs_minus_col_knot);
@@ -1023,7 +1024,7 @@ obs_minus_col_knot);
 
 if (verbose > 4)
 /* if (knot_row_ctr + row_start == 0 && knot_col_ctr + col_start == 0) */
-printf ("%ld: Adding %f * %f = %f to spot %ld %ld, giving %f\n", j,
+Rprintf ("%ld: Adding %f * %f = %f to spot %ld %ld, giving %f\n", j,
 obs_minus_row_knot, obs_minus_col_knot,
 obs_minus_row_knot * obs_minus_col_knot,
 knot_row_ctr + row_start, knot_col_ctr + col_start,
@@ -1115,7 +1116,7 @@ else
                         temp + obs_minus_col_knot;
 
 if (verbose > 4)
-printf("%ld: Adding obs - knot %ld (%f) to spot %ld %ld giving %f\n",
+Rprintf("%ld: Adding obs - knot %ld (%f) to spot %ld %ld giving %f\n",
 j, knot_col_ctr, obs_minus_col_knot, this_row, knot_col_ctr + col_start,
 temp + obs_minus_col_knot);
 
@@ -1129,7 +1130,7 @@ temp + obs_minus_col_knot);
 					    col_ctr + 1):
                                (long) *SUB (training, j, col_ctr + 1));
 /******
-printf ("Cat col is (cum) %ld + (entry) %ld (choices %ld and %ld), = %ld\n", 
+Rprintf ("Cat col is (cum) %ld + (entry) %ld (choices %ld and %ld), = %ld\n", 
 cum_cats_this_subset[col_ctr], 
 col_ctr == which_to_permute?
 (long) *SUB (training, permute_indices[j], col_ctr + 1):
@@ -1171,7 +1172,7 @@ for (j = 0; j < in->ncol; j++)
     jth_diag = *SUB (prior, j, j);
     if (jth_diag == 0.0)
     {
-        fprintf (stderr, "Abort! %ldth Prior is 0!\n", j);
+        Rprintf ("Abort! %ldth Prior is 0!\n", j);
         return (FALSE);
     }
     for (i = 0; i < in->nrow; i++)
@@ -1193,7 +1194,7 @@ if (prior == (MATRIX *) NULL)
 
 if (in->ncol != prior->ncol)
 {
-    fprintf (stderr, "Big time trouble.\n");
+    Rprintf ("Big time trouble.\n");
     return (NON_CONFORMABLE);
 }
 
@@ -1239,7 +1240,7 @@ else
                              (*a)->nrow * (*a)->ncol * sizeof (double));
         if (realloc_result == (char *) NULL)
         {
-            fprintf (stderr, "Resize matrix: realloc failed\n");
+            Rprintf ("Resize matrix: realloc failed\n");
             return (FALSE);
         }
 ***/
@@ -1288,7 +1289,7 @@ for (j = 0; j < nrow; j++)
                 phi->data[knot_ctr + offset];
 **/
             if (verbose > 1)
-fprintf (stderr, "Obs %ld: # %f - knot (%ld) %f  makes temp %f\n",
+Rprintf ("Obs %ld: # %f - knot (%ld) %f  makes temp %f\n",
 j, *SUB (adjustee, j, column + 1), knot_ctr, obs_minus_knot, temp);
         }
         *SUB (adjustee, j, column + 1) = temp;
@@ -1318,7 +1319,7 @@ long j, j_start, both_are_bad;
 long var_ctr, increase_ctr;
 long temp_long;
 
-long e04_iter = 350L;
+/* long e04_iter = 350L; */
 long e04_msglvl = 1L;
 long lin_const_count, nonlin_const_count = 1;
 double nonlin_const_value;
@@ -1343,9 +1344,9 @@ int adjust_this_one;
 static long last_variable_ordered = -2;
 
 /* Variables specific to e04vcf */
-double bigbnd, epsaf, eta, *featol;
-int cold, fealin, orthog;
-MATRIX *R;
+/* double bigbnd, epsaf, eta, *featol; */
+/* int cold, fealin, orthog; */
+/* MATRIX *R; */
 /*=============================*/
 int set_WSS_to_1_in_a_desperate_hope_to_get_the_constraint_working = FALSE;
 int christ_im_desperate = FALSE;
@@ -1412,9 +1413,11 @@ lin_const_matrix = make_matrix (current_cat_total, lin_const_count,
                         "Lin Const", REGULAR, TRUE);
 /*
 ** Preparations specific to e04vcf
+**
+**
+** R = make_matrix (current_cat_total, current_cat_total, "R", REGULAR, TRUE);
+** alloc_some_doubles (&featol, nc_total);
 */
-R = make_matrix (current_cat_total, current_cat_total, "R", REGULAR, TRUE);
-alloc_some_doubles (&featol, nc_total);
 /*
 ** Okay. If we don;'t know which way "which_var" (the one being added) 
 ** goes, go through this bit twice, once for increasing and once for 
@@ -1457,13 +1460,13 @@ HERE! HERE! HERE!
         if (am_i_in[var_ctr] < CURRENTLY_IN)
         {
             if (verbose > 1)
-                printf ("Variable %ld? Not in.\n", var_ctr);
+                Rprintf ("Variable %ld? Not in.\n", var_ctr);
             continue;
         }
 
         cat_start = cum_cats_this_subset[var_ctr];
         if (verbose > 1)
-            printf ("Var ctr %ld, cat_start %ld\n", var_ctr, cat_start);
+            Rprintf ("Var ctr %ld, cat_start %ld\n", var_ctr, cat_start);
 
 /* "j" counts through the columns of this constraint. It starts
 ** at 0, but we operate starting wherever "j_start" starts.
@@ -1477,7 +1480,7 @@ HERE! HERE! HERE!
             *RSUB (lin_const_matrix, temp_long, j_start + j) 
                 = *SUB (global_copy_of_w, cat_start + j, cat_start + j);
              if (verbose > 1)
-                 printf ("Loadin' from w %ld %ld into const  %ld %ld\n", 
+                 Rprintf ("Loadin' from w %ld %ld into const  %ld %ld\n", 
                      cat_start + j, cat_start + j, temp_long, j_start + j);
         }
         lower_bounds[current_cat_total + temp_long] =  0.0;
@@ -1489,7 +1492,7 @@ HERE! HERE! HERE!
         {
             j_start += cats_in_var[var_ctr];
             if (verbose > 1)
-                printf ("That's all for variable %ld\n", var_ctr);
+                Rprintf ("That's all for variable %ld\n", var_ctr);
             continue;
         }
 
@@ -1497,7 +1500,7 @@ HERE! HERE! HERE!
         {
 if (verbose > 1)
 {
-    printf ("Putting %ld into const %ld %ld, other into %ld %ld...\n",
+    Rprintf ("Putting %ld into const %ld %ld, other into %ld %ld...\n",
     (long) (increase[var_ctr] == DECREASING ? 1L : (long) -1), temp_long, j,
     temp_long, j+1);
 }
@@ -1540,7 +1543,7 @@ if (set_WSS_to_1_in_a_desperate_hope_to_get_the_constraint_working)
              gradient_result, phi->data,
              double_work, &length_double_work, &NAG_status);
 
-printf ("Status from e04zcf is %ld\n", NAG_status);
+Rprintf ("Status from e04zcf is %ld\n", NAG_status);
     NAG_status = 1L;
     e04_iter = (long) 350;
     e04_msglvl = 1L;
@@ -1560,6 +1563,7 @@ printf ("Status from e04zcf is %ld\n", NAG_status);
 ** Variables specific to e04vcf 
 */
 
+/*
      bigbnd = 1.0e+20;
      epsaf  = 1.0e-06;
      eta    = 0.9;
@@ -1569,9 +1573,9 @@ printf ("Status from e04zcf is %ld\n", NAG_status);
      fealin = TRUE;
      orthog = TRUE;
      e04_msglvl = 0L;
-
-     NAG_status = 1;
      e04_iter   = 30L;
+*/
+     NAG_status = 1;
      christ_im_desperate = TRUE;
 
      while (christ_im_desperate == TRUE)
@@ -1597,9 +1601,11 @@ printf ("Status from e04zcf is %ld\n", NAG_status);
         break;
     if (NAG_status == 3)
     {
+/*
         change_to_the_identity (R);
         cold = FALSE;
-        printf ("Stuck in the NAG status = 3 loop!\n");
+*/
+        Rprintf ("Stuck in the NAG status = 3 loop!\n");
         continue;
     }
     break;
@@ -1610,11 +1616,10 @@ printf ("Status from e04zcf is %ld\n", NAG_status);
 
     if (NAG_status != 0)
     {
-        fprintf (stderr, 
-            "Serious trouble: NAG_status is %ld\n", NAG_status);
+        Rprintf ("Serious trouble: NAG_status is %ld\n", NAG_status);
         if (NAG_status == 2L)
         {
-            fprintf (stderr, "Warning: one non-lin gave NAG 2\n");
+            Rprintf ("Warning: one non-lin gave NAG 2\n");
         }
         else
         {
@@ -1629,18 +1634,18 @@ printf ("Status from e04zcf is %ld\n", NAG_status);
 if (both_are_bad == 2 || (both_are_bad == 1 && !adjust_this_one))
 {
 /* Leave "result" unchanged */
-    fprintf (stderr, "Huge Trouble: Both Failed!\n");
+    Rprintf ("Huge Trouble: Both Failed!\n");
     matrix_copy (phi, save_phi);
     if (adjust_this_one)
     {
         increase[which_var] = UNORDERED;
-        fprintf (stderr, "Number %ld is now unordered!\n", which_var);
+        Rprintf ("Number %ld is now unordered!\n", which_var);
     }
     else
     {
-        fprintf (stderr, "That's weird; we're on non-adjusted number %ld,",
+        Rprintf ("That's weird; we're on non-adjusted number %ld,",
                  which_var);
-        fprintf (stderr, " unordering last ordered number %ld\n",
+        Rprintf (" unordering last ordered number %ld\n",
                 last_variable_ordered);
         increase[last_variable_ordered] = UNORDERED;
     }
@@ -1655,7 +1660,7 @@ else
         if (adjust_this_one)
         {
             increase[which_var] = INCREASING;
-            fprintf (stderr, "%ld is increasing\n", which_var);
+            Rprintf ("ld is increasing\n", which_var);
         }
     }
     else
@@ -1665,7 +1670,7 @@ else
         if (adjust_this_one)
         {
             increase[which_var] = DECREASING;
-            fprintf (stderr, "%ld is decreasing\n", which_var);
+            Rprintf ("ld is decreasing\n", which_var);
         }
     }
 }
@@ -1682,9 +1687,9 @@ free (lin_const_matrix->data);
 free (save_phi->data);
 /*
 ** Specific to e04vcf
+** free (R->data);
+** free (featol);
 */
-free (R->data);
-free (featol);
 
 return (objective_result);
 
@@ -1871,8 +1876,8 @@ else
             eigen_iterations,
             &NAG_status);
 #else
-    fprintf (stderr, "Sorry; ridge currently required to be != 0!\n");
-    exit(0);
+    Rprintf ("Sorry; ridge currently required to be != 0!\n");
+    return(-1);
 #endif
     for (i = 0; i < eigenval_ptr->nrow; i++)
         eigenval_ptr->data[i] /= eigenvalues_beta->data[i];
@@ -1889,7 +1894,7 @@ else
 }
 
 if (NAG_status != 0)
-    fprintf (stderr, "Eigen NAG status is %li\n", NAG_status);
+    Rprintf ("Eigen NAG status is %li\n", NAG_status);
 
 return (0);
 } /* end "do_the_eigen_thing" */
@@ -2322,7 +2327,7 @@ else
 
 if (inv_result < 0)
 {
-    fprintf (stderr, "Invert failed with %d\n", inv_result);
+    Rprintf ("Invert failed with %d\n", inv_result);
     return (-1);
 }
 
@@ -2633,7 +2638,7 @@ if (first_time_through)
                     prior, misclass_rate, misclass_mat, do_the_omission);
 
 /**
-    printf ("Discrimination misclass_rate is %f\n", *misclass_rate);
+    Rprintf ("Discrimination misclass_rate is %f\n", *misclass_rate);
                 print_matrix (misclass_mat, 8);
                 free (misclass_mat->data);
 **/
@@ -2642,7 +2647,7 @@ if (first_time_through)
             for (k_ctr = 0; k_ctr < k_len; k_ctr++)
             {
 /*
-fprintf (stderr, "Adding %f to spot %ld %ld\n", misclass_rate[k_ctr],
+Rprintf ("Adding %f to spot %ld %ld\n", misclass_rate[k_ctr],
  dimension - 1, k_ctr);
 */
                 *SUB (xval_result, dimension - 1, k_ctr) =
@@ -2650,7 +2655,7 @@ fprintf (stderr, "Adding %f to spot %ld %ld\n", misclass_rate[k_ctr],
                     + misclass_rate[k_ctr];
             }
 /*
-printf ("Xval result is now...\n");
+Rprintf ("Xval result is now...\n");
 print_matrix (xval_result, 8);
 */
         } /* end "if xval_result is not NULL" */
@@ -2837,7 +2842,7 @@ print_matrix (xval_result, 8);
     } /* end "permute_ctr" loop */
 
 /***
-    fprintf (stderr, "\tColumn %li had %li bigger\n", i, how_many_bigger);
+    Rprintf ("tColumn %li had %li bigger\n", i, how_many_bigger);
 
     if (classification == CLASSIFICATION && ridge <= 0)
     {
@@ -2942,12 +2947,12 @@ i, increase[i], how_many_bigger, permute_tail);
 free (current_eigenvalue);
 /* free (am_i_in); */
 
-get_a_solution ((long) NULL, (long *) NULL, (long) NULL, (long) NULL, 
+get_a_solution ((long) 0, (long *) NULL, (long) 0, (long) 0, 
     (MATRIX *) NULL, (MATRIX *) NULL, (Slong *) NULL, (Slong *) NULL, 
     (double **) NULL, (long *) NULL, (MATRIX *) NULL, (MATRIX *) NULL, 
-    (MATRIX *) NULL, (double) 0, classification, (long) NULL, (int) NULL, 
-    (long)  NULL, (MATRIX **) NULL, (int)  NULL, (int)  NULL, (int)  NULL, 
-    (int) NULL, (Slong *) NULL, TRUE /* quit */);
+    (MATRIX *) NULL, (double) 0, classification, (long) 0, (int) 0, 
+    (long)  0, (MATRIX **) NULL, (Slong)  0, (int)  0, (int)  0, 
+    (int) 0, (Slong *) NULL, TRUE /* quit */);
 
 return (TRUE);
 

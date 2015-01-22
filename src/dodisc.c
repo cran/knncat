@@ -8,6 +8,7 @@
 #include "matrix.h"
 #include "utils.h"
 #include "ord.h"
+#include "R.h"
 
 #ifdef USE_R_ALLOC
 void do_nothing();
@@ -106,6 +107,9 @@ else
         status = expand_vector (phi_row_ptr, short_phi_row_ptr, dimension - 1,
                        number_of_variables, cum_cats_this_subset,
                        (double *) NULL);
+        if (status == FALSE) {
+           /* take no action? */
+        }
     }
 }
 
@@ -174,7 +178,7 @@ for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
                 this_cost = *SUB (cost, class_ctr, (class_ctr == 0? 1:0) );
                 if (this_cost <= 0)
                 {
-                    fprintf (stderr, "Illegal cost matrix: abandoning!\n");
+                    Rprintf ("Illegal cost matrix: abandoning!\n");
                     cost = (MATRIX *) NULL;
                     dist += add_dist;
                 }
@@ -186,15 +190,15 @@ for (test_ctr = 0; test_ctr < test->nrow; test_ctr++)
                    / one_minus_eigen[l_ctr];
 ***/
             if (verbose > 1)
-                printf ("Theta is %f, my_sum is %f, divided by %f\n",
+                Rprintf ("Theta is %f, my_sum is %f, divided by %f\n",
                 *SUB (eigenvectors, l_ctr, class_ctr), my_sum, 
                     one_minus_eigen[l_ctr]);
             if (verbose >= 2)
-                printf ("Dist is...%f\n", dist);
+                Rprintf ("Dist is...%f\n", dist);
 
         }
 if (verbose > 1)
-printf ("  Class ctr %ld, dist %8.8f...\n", class_ctr, dist);
+Rprintf ("  Class ctr %ld, dist %8.8f...\n", class_ctr, dist);
         if (shortest_class < 0
         ||  dist < shortest_dist)
         {
@@ -211,7 +215,7 @@ printf ("  Class ctr %ld, dist %8.8f...\n", class_ctr, dist);
     if (shortest_class != test_class)
     {
         if (verbose >= 1)
-            printf ("%ld: Misclass a %ld as a %ld\n", test_ctr, 
+            Rprintf ("%ld: Misclass a %ld as a %ld\n", test_ctr, 
                   test_class, shortest_class);
             if (cost == (MATRIX *) NULL)
                 misclass ++;
@@ -219,7 +223,7 @@ printf ("  Class ctr %ld, dist %8.8f...\n", class_ctr, dist);
                 misclass += *SUB (cost, test_class, shortest_class);
     }
 if (verbose > 1)
-printf ("%ld: Data %ld %ld (%ld) %ld, class %ld assigned to %ld\n", test_ctr, 
+Rprintf ("%ld: Data %ld %ld (%ld) %ld, class %ld assigned to %ld\n", test_ctr, 
               (long) *SUB (test, test_ctr, 1L),
               (long) *SUB (test, test_ctr, 2L),
               (long) *SUB (test, test_ctr, 3L),
@@ -303,13 +307,13 @@ unsigned long second_var_in = 0, found_first;
 
 if (new->nrow != 1 || old->nrow != 1)
 {
-    fprintf (stderr, "Expand vector called, but one has rows not equal 1\n");
+    Rprintf ("Expand vector called, but one has rows not equal 1\n");
     return (FALSE);
 }
 
 if (new->ncol != old->ncol + how_many_holes)
 {
-    fprintf (stderr, "Expand vector called, but sizes are wrong\n");
+    Rprintf ("Expand vector called, but sizes are wrong\n");
     return (FALSE);
 }
 

@@ -18,6 +18,7 @@
 #include "matrix.h"
 #include "utils.h"
 #include "ord.h"
+#include "R.h"
 
 #ifdef USE_R_ALLOC
 extern char *R_alloc();
@@ -108,7 +109,7 @@ if (verbose > 0)
 {
     print_matrix (&phi, TRANSPOSE_FIRST);
     print_matrix (&jacobian_mat, TRANSPOSE_FIRST);
-    printf ("Constraint is %f\n", value[0]);
+    Rprintf ("Constraint is %f\n", value[0]);
 }
 
 
@@ -126,7 +127,7 @@ for (i = 0L; i < global_gradient.nrow; i++)
 *objvalue = global_objective_value;
 
 if (verbose > 0)
-    printf ("Hi. Objective is %f\n", *objvalue);
+    Rprintf ("Hi. Objective is %f\n", *objvalue);
 
 } /* end "objective" */
 

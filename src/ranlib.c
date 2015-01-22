@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include "R.h"
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 #define min(a,b) ((a) <= (b) ? (a) : (b))
 #define max(a,b) ((a) >= (b) ? (a) : (b))
@@ -9,6 +10,8 @@
 void ftnstop(char*);
 float genbet(float aa,float bb)
 /*
+** Buttrey note: replaced exit() with return(-HUGE_VAL) Jan 2015. 
+** Replaced fputs/fprintf pairs with Rprintf
 **********************************************************************
      float genbet(float aa,float bb)
                GeNerate BETa random deviate
@@ -39,9 +42,9 @@ static long qsame;
     qsame = olda == aa && oldb == bb;
     if(qsame) goto S20;
     if(!(aa <= 0.0 || bb <= 0.0)) goto S10;
-    fputs(" AA or BB <= 0 in GENBET - Abort!",stderr);
-    fprintf(stderr," AA: %16.6E BB %16.6E\n",aa,bb);
-    exit(1);
+    Rprintf(" AA or BB <= 0 in GENBET - Abort!");
+    Rprintf(" AA: %16.6E BB %16.6E\n",aa,bb);
+    return(-HUGE_VAL);
 S10:
     olda = aa;
     oldb = bb;
@@ -190,9 +193,9 @@ float genchi(float df)
 static float genchi;
 
     if(!(df <= 0.0)) goto S10;
-    fputs("DF <= 0 in GENCHI - ABORT",stderr);
-    fprintf(stderr,"Value of DF: %16.6E\n",df);
-    exit(1);
+    Rprintf("DF <= 0 in GENCHI - ABORT");
+    Rprintf("Value of DF: %16.6E\n",df);
+    return(-HUGE_VAL);
 S10:
     genchi = 2.0*gengam(1.0,df/2.0);
     return genchi;
@@ -246,9 +249,9 @@ float genf(float dfn,float dfd)
 static float genf,xden,xnum;
 
     if(!(dfn <= 0.0 || dfd <= 0.0)) goto S10;
-    fputs("Degrees of freedom nonpositive in GENF - abort!",stderr);
-    fprintf(stderr,"DFN value: %16.6EDFD value: %16.6E\n",dfn,dfd);
-    exit(1);
+    Rprintf("Degrees of freedom nonpositive in GENF - abort!");
+    Rprintf("DFN value: %16.6EDFD value: %16.6E\n",dfn,dfd);
+    return(-HUGE_VAL);
 S10:
     xnum = genchi(dfn)/dfn;
 /*
@@ -256,9 +259,9 @@ S10:
 */
     xden = genchi(dfd)/dfd;
     if(!(xden <= 9.999999999998E-39*xnum)) goto S20;
-    fputs(" GENF - generated numbers would cause overflow",stderr);
-    fprintf(stderr," Numerator %16.6E Denominator %16.6E\n",xnum,xden);
-    fputs(" GENF returning 1.0E38",stderr);
+    Rprintf(" GENF - generated numbers would cause overflow");
+    Rprintf(" Numerator %16.6E Denominator %16.6E\n",xnum,xden);
+    Rprintf(" GENF returning 1.0E38");
     genf = 1.0E38;
     goto S30;
 S20:
@@ -439,9 +442,9 @@ float gennch(float df,float xnonc)
 static float gennch;
 
     if(!(df <= 1.0 || xnonc < 0.0)) goto S10;
-    fputs("DF <= 1 or XNONC < 0 in GENNCH - ABORT",stderr);
-    fprintf(stderr,"Value of DF: %16.6E Value of XNONC%16.6E\n",df,xnonc);
-    exit(1);
+    Rprintf("DF <= 1 or XNONC < 0 in GENNCH - ABORT");
+    Rprintf("Value of DF: %16.6E Value of XNONC%16.6E\n",df,xnonc);
+    return(-HUGE_VAL);
 S10:
     gennch = genchi(df-1.0)+pow(gennor(sqrt(xnonc),1.0),2.0);
     return gennch;
@@ -474,13 +477,13 @@ static long qcond;
 
     qcond = dfn <= 1.0 || dfd <= 0.0 || xnonc < 0.0;
     if(!qcond) goto S10;
-    fputs("In GENNF - Either (1) Numerator DF <= 1.0 or",stderr);
-    fputs("(2) Denominator DF < 0.0 or ",stderr);
-    fputs("(3) Noncentrality parameter < 0.0",stderr);
-    fprintf(stderr,
+    Rprintf("In GENNF - Either (1) Numerator DF <= 1.0 or");
+    Rprintf("(2) Denominator DF < 0.0 or ");
+    Rprintf("(3) Noncentrality parameter < 0.0");
+    Rprintf(
       "DFN value: %16.6EDFD value: %16.6EXNONC value: \n%16.6E\n",dfn,dfd,
       xnonc);
-    exit(1);
+    return(-HUGE_VAL);
 S10:
     xnum = gennch(dfn,xnonc)/dfn;
 /*
@@ -488,9 +491,9 @@ S10:
 */
     xden = genchi(dfd)/dfd;
     if(!(xden <= 9.999999999998E-39*xnum)) goto S20;
-    fputs(" GENNF - generated numbers would cause overflow",stderr);
-    fprintf(stderr," Numerator %16.6E Denominator %16.6E\n",xnum,xden);
-    fputs(" GENNF returning 1.0E38",stderr);
+    Rprintf(" GENNF - generated numbers would cause overflow");
+    Rprintf(" Numerator %16.6E Denominator %16.6E\n",xnum,xden);
+    Rprintf(" GENNF returning 1.0E38");
     gennf = 1.0E38;
     goto S30;
 S20:
@@ -562,9 +565,9 @@ float genunf(float low,float high)
 static float genunf;
 
     if(!(low > high)) goto S10;
-    fprintf(stderr,"LOW > HIGH in GENUNF: LOW %16.6E HIGH: %16.6E\n",low,high);
-    fputs("Abort",stderr);
-    exit(1);
+    Rprintf("LOW > HIGH in GENUNF: LOW %16.6E HIGH: %16.6E\n",low,high);
+    Rprintf("Abort");
+    return(-HUGE_VAL);
 S10:
     genunf = low+(high-low)*ranf();
     return genunf;
@@ -587,8 +590,8 @@ static long curntg = 1;
     if(getset == 0) *g = curntg;
     else  {
         if(*g < 0 || *g > numg) {
-            fputs(" Generator number out of range in GSCGN",stderr);
-            exit(0);
+            Rprintf(" Generator number out of range in GSCGN");
+            return;
         }
         curntg = *g;
     }
@@ -1192,14 +1195,14 @@ long ignuin(long low,long high)
 static long ignuin,ign,maxnow,range,ranp1;
 
     if(!(low > high)) goto S10;
-    fputs(" low > high in ignuin - ABORT",stderr);
-    exit(1);
+    Rprintf(" low > high in ignuin - ABORT");
+    return(-maxnum);
 
 S10:
     range = high-low;
     if(!(range > maxnum)) goto S20;
-    fputs(" high - low too large in ignuin - ABORT",stderr);
-    exit(1);
+    Rprintf(" high - low too large in ignuin - ABORT");
+    return(-maxnum);
 
 S20:
     if(!(low == high)) goto S30;
@@ -1259,10 +1262,10 @@ static long mltmod,a0,a1,k,p,q,qh,rh;
       machine. On a different machine recompute H
 */
     if(!(a <= 0 || a >= m || s <= 0 || s >= m)) goto S10;
-    fputs(" a, m, s out of order in mltmod - ABORT!",stderr);
-    fprintf(stderr," a = %12ld s = %12ld m = %12ld\n",a,s,m);
-    fputs(" mltmod requires: 0 < a < m; 0 < s < m",stderr);
-    exit(1);
+    Rprintf(" a, m, s out of order in mltmod - ABORT!");
+    Rprintf(" a = %12ld s = %12ld m = %12ld\n",a,s,m);
+    Rprintf(" mltmod requires: 0 < a < m; 0 < s < m");
+    return(h);
 S10:
     if(!(a < h)) goto S20;
     a0 = a;
@@ -1441,16 +1444,16 @@ void setgmn(float *meanv,float *covm,long p,float *parm)
 */
 {
 extern void spofa(float *a,long lda,long n,long *info);
-static long T1;
+/* static long T1; */
 static long i,icount,info,j,D2,D3,D4,D5;
-    T1 = p*(p+3)/2+1;
 /*
+    T1 = p*(p+3)/2+1;
      TEST THE INPUT
 */
     if(!(p <= 0)) goto S10;
-    fputs("P nonpositive in SETGMN",stderr);
-    fprintf(stderr,"Value of P: %12ld\n",p);
-    exit(1);
+    Rprintf("P nonpositive in SETGMN");
+    Rprintf("Value of P: %12ld\n",p);
+    return;
 S10:
     *parm = p;
 /*
@@ -1462,8 +1465,8 @@ S10:
 */
     spofa(covm,p,p,&info);
     if(!(info != 0)) goto S30;
-    fputs(" COVM not positive definite in SETGMN",stderr);
-    exit(1);
+    Rprintf(" COVM not positive definite in SETGMN");
+    return;
 S30:
     icount = p+1;
 /*
@@ -1895,6 +1898,6 @@ Prints msg to standard error and then exits
 void ftnstop(char* msg)
 /* msg - error message */
 {
-  if (msg != NULL) fprintf(stderr,"%s\n",msg);
-  exit(0);
+  if (msg != NULL) Rprintf("%s\n",msg);
+  return;
 }

@@ -85,10 +85,13 @@ variable.}
 \references{Buttrey, S.E., Nearest-neighbor classification with categorical
 variables, Comp. Stat. Data Analysis 28 (1998), 157-169.}
 \examples{
-library(MASS) # Load data set
+\dontrun{
+data ("synth.tr", package="MASS")
+data ("synth.te", package="MASS")
 syncat <- knncat (synth.tr, classcol=3)
-\dontrun{syncat
+syncat
 Train set misclass rate: 12.8%
+
 synpred <- predict (syncat, synth.tr, synth.te, train.classcol=3,
                     newdata.classcol=3)
 table (synpred, synth.te$yc)
@@ -99,9 +102,8 @@ synpred 0   1
 #
 # Or do the whole thing in one pass:
 #
-}
+
 knncat (synth.tr, synth.te, classcol=3)
-\dontrun{
 Test set misclass rate: 13.1%
 }
 }

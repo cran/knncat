@@ -34,7 +34,7 @@ void donnwrap (
           Slong *verbose, Slong *status)
 {
 long i;
-MATRIX *training, *test, *c, *cost, *misclass_mat, *prior;
+MATRIX *training, *test, *c, *prior;
 Slong quit, theyre_the_same; 
 long how_many_ks, xval_lower, xval_upper;
 long knot_ctr, number_of_vars;
@@ -50,8 +50,6 @@ test->data     = testdata;
 c              = make_matrix (1, *traincols, "C", REGULAR, TRUE);
 for (i = 0; i < *traincols; i++)
     c->data[i] = 1.0;
-cost           = (MATRIX *) NULL;
-misclass_mat   = (MATRIX *) NULL;
 prior          = make_matrix (*number_of_classes, *number_of_classes,
                      "Prior", REGULAR, TRUE);
 for (i = 0; i < *number_of_classes; i++)
