@@ -1,4 +1,4 @@
-bf65b024c774133ddff7205c17d129ee *DESCRIPTION
+576541126ce928662f68b7f9944c9b12 *DESCRIPTION
 95256a0b8f91aaf573936655df87e159 *INDEX
 a84f652689cc7d2fbd00ae76bd2dff79 *NAMESPACE
 9f9826562ecd6b80f69a30845f8fe1a0 *R/knncat.R
@@ -16,7 +16,7 @@ b24e88161b58935156ed2a4cc4412524 *src/dodisc.c
 4af7aeed1ed767603dd83e3e785fe576 *src/donn.c
 715afb90ff01bf49cf6cad931a534af1 *src/donn.h
 a397aa9ad2a2556ed32ae4085e3c420e *src/donnwrap.c
-25e1be42fecf1820f15a29a498f55300 *src/dsort.c
+ac7a1b59f9f09c50dd7999891ac2fafe *src/dsort.c
 beff16e6c608016666d0cfa77b091540 *src/f2c.h
 22534d167b3515d55f0f361f859c2eb4 *src/linpack.c
 e84636459328fe4ce03caf91e3d8c2a0 *src/matrix.c
@@ -24,7 +24,7 @@ e84636459328fe4ce03caf91e3d8c2a0 *src/matrix.c
 82032fbd53326a7b68b0e6a49178497c *src/objective.c
 80adc68fcfc5265aef8ae0b06b621d0d *src/ord.h
 2973520fa7838e9f2f347c67d4e73f7e *src/ordfuncs.h
-2da05e6de3fb6130b0abfc7150a2f8a0 *src/ords.c
+82cc63fff6f6d7aae040f3c2440b5a76 *src/ords.c
 3f6823de26faad58d4e5a837ed87a138 *src/ranlib.c
 1bc389d4eb21e36732e38d298a4b93f1 *src/ranlib.h
 1ad267aee7430403868f7a64041191cc *src/utils.h

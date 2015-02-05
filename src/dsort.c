@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 void dsort_ (double *DX, long *N, long *KFLAG)
 {
 /*************
@@ -51,7 +52,7 @@ C***END PROLOGUE  DSORT
       }
 
 /* Make sure that KFLAG has a recognizable value.*/
-      KK = fabs(*KFLAG);
+      KK = labs(*KFLAG);
       if (KK != 1 && KK != 2) 
       {
           *KFLAG = 2L;

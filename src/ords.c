@@ -582,7 +582,8 @@ if (classification == CLASSIFICATION)
     return_classes = &Slong_FALSE;
     do_nn (&Slong_TRUE, training, test, c, &(k[smallest_misclass_k]), &one, 
         &Slong_FALSE, phi->data, cats_in_var, cum_cats_ptr, knots, cost, 
-        &prior_ind, prior, misclass_rate, misclass_mat, FALSE, (Slong *) NULL,
+        &prior_ind, prior, misclass_rate, misclass_mat, (Slong *) NULL,
+        (Slong *) NULL,
         (long *) NULL, (long *) NULL, (long *) NULL,
         (Slong *) NULL, (Slong *) NULL, (Slong *) NULL);
 
